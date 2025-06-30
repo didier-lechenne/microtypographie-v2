@@ -56,14 +56,26 @@ export abstract class BaseFixer implements TypographicFixer {
     }
 
     /**
-     * Applique une transformation regex simple
+     * Applique une transformation regex avec remplacement par chaîne
+     */
+    protected applyRegexTransform(text: string, pattern: RegExp, replacement: string): string;
+    /**
+     * Applique une transformation regex avec remplacement par fonction
+     */
+    protected applyRegexTransform(text: string, pattern: RegExp, replacement: (substring: string, ...args: any[]) => string): string;
+    /**
+     * Applique une transformation regex simple - implémentation
      */
     protected applyRegexTransform(
         text: string, 
         pattern: RegExp, 
-        replacement: string | ((match: string, ...args: any[]) => string)
+        replacement: string | ((substring: string, ...args: any[]) => string)
     ): string {
-        return text.replace(pattern, replacement);
+        if (typeof replacement === 'string') {
+            return text.replace(pattern, replacement);
+        } else {
+            return text.replace(pattern, replacement);
+        }
     }
 
     /**
@@ -71,10 +83,17 @@ export abstract class BaseFixer implements TypographicFixer {
      */
     protected applyMultipleTransforms(
         text: string, 
-        transforms: Array<{pattern: RegExp, replacement: string | Function}>
+        transforms: Array<{
+            pattern: RegExp, 
+            replacement: string | ((substring: string, ...args: any[]) => string)
+        }>
     ): string {
         return transforms.reduce((result, transform) => {
-            return this.applyRegexTransform(result, transform.pattern, transform.replacement as any);
+            if (typeof transform.replacement === 'string') {
+                return this.applyRegexTransform(result, transform.pattern, transform.replacement);
+            } else {
+                return this.applyRegexTransform(result, transform.pattern, transform.replacement);
+            }
         }, text);
     }
 

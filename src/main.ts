@@ -20,8 +20,10 @@ import { DEFAULT_SETTINGS, validateSettings } from './settings/default-settings'
  * Correction typographique modulaire pour Obsidian
  */
 export default class TypographyPlugin extends Plugin {
-    settings: TypographySettings;
-    engine: TypographyEngine;
+    // Utilisation de l'assertion d'assignation définitive (!)
+    // Ces propriétés sont initialisées dans onload() avant toute utilisation
+    settings!: TypographySettings;
+    engine!: TypographyEngine;
 
     /**
      * Chargement du plugin
@@ -112,17 +114,6 @@ export default class TypographyPlugin extends Plugin {
             icon: 'zap',
             callback: async () => {
                 await this.toggleRealTimeCorrection();
-            }
-        });
-
-        // Commande: Ouvrir les paramètres
-        this.addCommand({
-            id: 'open-settings',
-            name: 'Ouvrir les paramètres',
-            icon: 'settings',
-            callback: () => {
-                this.app.setting.open();
-                this.app.setting.openTabById('microtypographie-v2');
             }
         });
 
