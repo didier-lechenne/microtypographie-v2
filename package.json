@@ -4,8 +4,8 @@
   "description": "Plugin Obsidian pour la correction typographique automatique",
   "main": "main.js",
   "scripts": {
-    "dev": "node esbuild.config.mjs",
-    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "dev": "node esbuild.config.js",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
     "version": "node version-bump.js"
   },
   "keywords": [

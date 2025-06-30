@@ -6,7 +6,6 @@ import {
     Plugin, 
     PluginSettingTab, 
     Setting,
-    KeyboardEvent,
     EditorChange,
     TFile
 } from 'obsidian';
@@ -52,8 +51,8 @@ const UNICODE_CHARS = {
     TIMES: '×',                     // symbole fois
     LDQUO: '"',                     // guillemet ouvrant
     RDQUO: '"',                     // guillemet fermant
-    LSQUO: ''',                     // apostrophe ouvrante
-    RSQUO: ''',                     // apostrophe fermante
+    LSQUO: '“',                     // apostrophe ouvrante
+    RSQUO: '”',                     // apostrophe fermante
     LAQUO: '«',                     // guillemet français ouvrant
     RAQUO: '»',                     // guillemet français fermant
     TRADE: '™',                     // trademark
@@ -382,16 +381,16 @@ class TypographyEngine {
 
 const DEFAULT_SETTINGS: TypographySettings = {
     enableRealTimeCorrection: true,
-    locale: 'en-US',
+    locale: 'fr-FR',
     fixers: {
         'ellipsis': true,
         'dash': true,
-        'french-spacing': false,
+        'french-spacing': true,  // Règle principale pour le français
         'smart-quotes': true,
-        'math-symbols': true,
+        'math-symbols': false,   // Moins prioritaire pour commencer
         'no-space-comma': true
     }
-};
+}
 
 export default class TypographyPlugin extends Plugin {
     settings: TypographySettings;

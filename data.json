@@ -1,0 +1,12 @@
+{
+  "enableRealTimeCorrection": true,
+  "locale": "fr-FR",
+  "fixers": {
+    "ellipsis": true,
+    "dash": true,
+    "french-spacing": true,
+    "smart-quotes": true,
+    "math-symbols": false,
+    "no-space-comma": true
+  }
+}
