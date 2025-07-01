@@ -83,6 +83,10 @@ export interface TypographySettings {
     /** Active/désactive l'affichage des caractères invisibles */
     highlightEnabled: boolean;
     
+    highlightButton: boolean;
+    tabTitleBarButton: boolean;
+
+    
 }
 
 /**

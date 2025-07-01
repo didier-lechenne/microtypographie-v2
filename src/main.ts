@@ -32,6 +32,7 @@ export default class TypographyPlugin extends Plugin {
   engine!: TypographyEngine;
   statusBarButton: HTMLElement | null = null;
   tabTitleBarButton: HTMLElement | null = null;
+  decorationExtension: any = null;
 
   /**
    * Chargement du plugin

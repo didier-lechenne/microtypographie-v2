@@ -7,7 +7,9 @@ import { TypographySettings } from '../types/interfaces';
 export const DEFAULT_SETTINGS: TypographySettings = {
     enableRealTimeCorrection: true,
     locale: 'fr_FR',
-    highlightEnabled: false,                    
+    highlightEnabled: false,
+    highlightButton: true,     
+    tabTitleBarButton: false,                      
     fixers: {
         // Fixers JoliTypo - IDs exacts
         'Ellipsis': true,                // Points de suspension : ... → …
@@ -95,6 +97,8 @@ export function createSettingsForLocale(locale: string): TypographySettings {
         enableRealTimeCorrection: true,
         locale: locale,
         highlightEnabled: false,
+            highlightButton: true,        // ✅ Ajouté
+    tabTitleBarButton: false,     // ✅ Ajouté
         fixers: {}
     };
 
@@ -115,12 +119,14 @@ export function createSettingsForLocale(locale: string): TypographySettings {
  * Valide et corrige les paramètres chargés
  */
 export function validateSettings(settings: Partial<TypographySettings>): TypographySettings {
-    const validated: TypographySettings = {
-        enableRealTimeCorrection: settings.enableRealTimeCorrection ?? DEFAULT_SETTINGS.enableRealTimeCorrection,
-        locale: settings.locale ?? DEFAULT_SETTINGS.locale,
-        highlightEnabled: settings.highlightEnabled ?? DEFAULT_SETTINGS.highlightEnabled,
-        fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
-    };
+const validated: TypographySettings = {
+    enableRealTimeCorrection: settings.enableRealTimeCorrection ?? DEFAULT_SETTINGS.enableRealTimeCorrection,
+    locale: settings.locale ?? DEFAULT_SETTINGS.locale,
+    highlightEnabled: settings.highlightEnabled ?? DEFAULT_SETTINGS.highlightEnabled,
+    highlightButton: settings.highlightButton ?? DEFAULT_SETTINGS.highlightButton,           // ✅ Ajouté
+    tabTitleBarButton: settings.tabTitleBarButton ?? DEFAULT_SETTINGS.tabTitleBarButton,     // ✅ Ajouté
+    fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
+};
 
     // Assurer que tous les fixers ont une valeur booléenne
     Object.keys(DEFAULT_SETTINGS.fixers).forEach(fixerId => {
