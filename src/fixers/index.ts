@@ -105,7 +105,7 @@ export const FixerFactories = {
  * Métadonnées sur les fixers disponibles
  */
 export const FixerMetadata = {
-    totalCount: 6,
+    totalCount: 5,
     categories: ['punctuation', 'spacing', 'quotes', 'symbols'] as const,
     
     getCategoryCount(category: string): number {
