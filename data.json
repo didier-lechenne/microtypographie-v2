@@ -5,7 +5,7 @@
     "ellipsis": true,
     "dash": true,
     "french-spacing": true,
-    "no-space-comma": true,
+    "comma": true,
     "smart-quotes": false
   }
 }

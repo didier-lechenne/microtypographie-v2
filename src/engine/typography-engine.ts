@@ -205,8 +205,8 @@ export class TypographyEngine {
      * Détermine l'état par défaut d'un fixer selon la configuration
      */
     private getDefaultEnabledState(fixerId: string): boolean {
-        const frenchEssentialFixers = ['ellipsis', 'dash', 'french-spacing', 'smart-quotes', 'no-space-comma'];
-        const englishEssentialFixers = ['ellipsis', 'dash', 'smart-quotes', 'no-space-comma'];
+        const frenchEssentialFixers = ['ellipsis', 'dash', 'french-spacing', 'smart-quotes', 'comma'];
+        const englishEssentialFixers = ['ellipsis', 'dash', 'smart-quotes', 'comma'];
         
         if (this.settings.locale.startsWith('fr')) {
             return frenchEssentialFixers.includes(fixerId);

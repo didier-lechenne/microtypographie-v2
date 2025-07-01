@@ -7,7 +7,7 @@ import { FixerExample } from '../../types/interfaces';
  * Supprime les espaces avant les virgules et normalise l'espacement après
  */
 export class CommaFixer extends BaseFixer {
-    public readonly id = 'no-space-comma';
+    public readonly id = 'comma';
     public readonly name = 'Virgules sans espace';
     public readonly description = 'Supprime les espaces avant les virgules et normalise l\'espacement';
     public readonly category = 'spacing' as const;

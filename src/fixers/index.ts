@@ -123,7 +123,7 @@ export const FixerMetadata = {
             'ellipsis',
             'dash', 
             'french-spacing',
-            'no-space-comma',
+            'comma',
             'smart-quotes'
         ];
     }

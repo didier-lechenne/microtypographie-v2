@@ -14,7 +14,7 @@ export const DEFAULT_SETTINGS: TypographySettings = {
         
         // Espacement français - Essentiel pour le français
         'french-spacing': true,  // Espaces insécables : ! ? ; :
-        'no-space-comma': true,  // Virgules sans espace avant
+        'comma': true,  // Virgules sans espace avant
         
         // Guillemets - Adaptatifs selon la langue
         'smart-quotes': true,    // Guillemets français « » ou anglais " "
@@ -34,7 +34,7 @@ export const ENGLISH_SETTINGS: TypographySettings = {
         'ellipsis': true,
         'dash': true,
         'french-spacing': false,  // Désactivé pour l'anglais
-        'no-space-comma': true,
+        'comma': true,
         'smart-quotes': true,
     }
 };
@@ -49,7 +49,7 @@ export const MINIMAL_SETTINGS: TypographySettings = {
         'ellipsis': true,
         'dash': false,
         'french-spacing': false,
-        'no-space-comma': true,
+        'comma': true,
         'smart-quotes': false,
     }
 };
