@@ -2,88 +2,111 @@
 import { TypographySettings } from '../types/interfaces';
 
 /**
- * Configuration par défaut du plugin - optimisée pour le français
+ * Configuration par défaut du plugin - basée sur JoliTypo fr_FR
  */
 export const DEFAULT_SETTINGS: TypographySettings = {
     enableRealTimeCorrection: true,
-    locale: 'fr-FR',
+    locale: 'fr_FR',
     fixers: {
-        // Ponctuation - Priorité haute
-        'ellipsis': true,        // Points de suspension : ... → …
-        'dash': true,            // Tirets typographiques : -- → —
-        
-        // Espacement français - Essentiel pour le français
-        'french-spacing': true,  // Espaces insécables : ! ? ; :
-        'comma': true,  // Virgules sans espace avant
-        
-        // Guillemets - Adaptatifs selon la langue
-        'smart-quotes': true,    // Guillemets français « » ou anglais " "
-        
-    },
-    
-
-};
-
-/**
- * Configuration alternative pour l'anglais
- */
-export const ENGLISH_SETTINGS: TypographySettings = {
-    enableRealTimeCorrection: true,
-    locale: 'en-US',
-    fixers: {
-        'ellipsis': true,
-        'dash': true,
-        'french-spacing': false,  // Désactivé pour l'anglais
-        'comma': true,
-        'smart-quotes': true,
+        // Fixers JoliTypo - IDs exacts
+        'Ellipsis': true,                // Points de suspension : ... → …
+        'Dash': true,                    // Tirets typographiques : -- → —
+        'SmartQuotes': true,             // Guillemets intelligents selon locale
+        'CurlyQuote': true,              // Apostrophes courbes : ' → '
+        'FrenchNoBreakSpace': true,      // Espaces insécables français : ! ? ; :
+        'NoSpaceBeforeComma': true,      // Virgules sans espace avant
+        'Unit': true,                    // Espaces avant unités : 25 kg
+        'Dimension': true,               // Multiplication : 12 x 34 → 12×34
+        'Hyphen': false,                 // Césure (complexe, désactivé par défaut)
+        'Trademark': true                // Marques : (c) → ©, (r) → ®, (tm) → ™
     }
 };
 
 /**
- * Configuration minimaliste (uniquement l'essentiel)
+ * Configurations JoliTypo par locale
+ * Utilise Record<string, string[]> pour la compatibilité TypeScript
  */
-export const MINIMAL_SETTINGS: TypographySettings = {
-    enableRealTimeCorrection: false,
-    locale: 'fr-FR',
-    fixers: {
-        'ellipsis': true,
-        'dash': false,
-        'french-spacing': false,
-        'comma': true,
-        'smart-quotes': false,
-    }
+export const LOCALE_CONFIGURATIONS: Record<string, string[]> = {
+    'en_GB': [
+        'Ellipsis', 
+        'Dimension', 
+        'Unit', 
+        'Dash', 
+        'SmartQuotes', 
+        'NoSpaceBeforeComma', 
+        'CurlyQuote', 
+        'Hyphen', 
+        'Trademark'
+    ],
+    'fr_FR': [
+        'Ellipsis', 
+        'Dimension', 
+        'Unit', 
+        'Dash', 
+        'SmartQuotes', 
+        'FrenchNoBreakSpace', 
+        'NoSpaceBeforeComma', 
+        'CurlyQuote', 
+        'Hyphen', 
+        'Trademark'
+    ],
+    'fr_CA': [
+        'Ellipsis', 
+        'Dimension', 
+        'Unit', 
+        'Dash', 
+        'SmartQuotes', 
+        'NoSpaceBeforeComma', 
+        'CurlyQuote', 
+        'Hyphen', 
+        'Trademark'
+    ],
+    'de_DE': [
+        'Ellipsis', 
+        'Dimension', 
+        'Unit', 
+        'Dash', 
+        'SmartQuotes', 
+        'NoSpaceBeforeComma', 
+        'CurlyQuote', 
+        'Hyphen', 
+        'Trademark'
+    ]
 };
 
 /**
- * Préconfigurations disponibles
+ * Noms d'affichage des langues
  */
-export const PRESET_CONFIGURATIONS = {
-    french: DEFAULT_SETTINGS,
-    english: ENGLISH_SETTINGS,
-    minimal: MINIMAL_SETTINGS
-} as const;
-
-/**
- * Noms d'affichage des préconfigurations
- */
-export const PRESET_NAMES = {
-    french: 'Français (recommandé)',
-    english: 'English',
-    minimal: 'Minimal'
-} as const;
+export const LOCALE_NAMES: Record<string, string> = {
+    'fr_FR': '🇫🇷 Français (France)',
+    'fr_CA': '🇨🇦 Français (Canada)',
+    'en_GB': '🇬🇧 English (UK)',
+    'de_DE': '🇩🇪 Deutsch (Deutschland)'
+};
 
 /**
  * Factory pour créer des paramètres selon la langue
  */
 export function createSettingsForLocale(locale: string): TypographySettings {
-    if (locale.startsWith('fr')) {
-        return { ...DEFAULT_SETTINGS, locale };
-    } else if (locale.startsWith('en')) {
-        return { ...ENGLISH_SETTINGS, locale };
-    } else {
-        // Par défaut, utiliser la configuration française
-        return { ...DEFAULT_SETTINGS, locale };
-    }
+    const activeFixers = LOCALE_CONFIGURATIONS[locale] || LOCALE_CONFIGURATIONS['fr_FR'];
+    
+    const settings: TypographySettings = {
+        enableRealTimeCorrection: true,
+        locale: locale,
+        fixers: {}
+    };
+
+    // Initialiser tous les fixers à false
+    Object.keys(DEFAULT_SETTINGS.fixers).forEach(fixerId => {
+        settings.fixers[fixerId] = false;
+    });
+
+    // Activer les fixers recommandés pour cette locale
+    activeFixers.forEach(fixerId => {
+        settings.fixers[fixerId] = true;
+    });
+
+    return settings;
 }
 
 /**
@@ -103,5 +126,45 @@ export function validateSettings(settings: Partial<TypographySettings>): Typogra
         }
     });
 
+    // Vérifier que la locale est supportée
+    if (!(validated.locale in LOCALE_CONFIGURATIONS)) {
+        validated.locale = 'fr_FR'; // Fallback vers français
+    }
+
     return validated;
 }
+
+/**
+ * Obtient la liste des fixers recommandés pour une locale
+ */
+export function getRecommendedFixersForLocale(locale: string): string[] {
+    return LOCALE_CONFIGURATIONS[locale] || LOCALE_CONFIGURATIONS['fr_FR'];
+}
+
+/**
+ * Vérifie si un fixer est recommandé pour une locale donnée
+ */
+export function isFixerRecommendedForLocale(fixerId: string, locale: string): boolean {
+    const recommendedFixers = getRecommendedFixersForLocale(locale);
+    return recommendedFixers.includes(fixerId);
+}
+
+/**
+ * Métadonnées sur les catégories de fixers
+ */
+export const FIXER_CATEGORIES: Record<string, string[]> = {
+    'punctuation': ['Ellipsis', 'Dash', 'Hyphen'],
+    'spacing': ['FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'Unit', 'Dimension'],
+    'quotes': ['SmartQuotes', 'CurlyQuote'],
+    'symbols': ['Trademark']
+};
+
+/**
+ * Noms d'affichage des catégories
+ */
+export const CATEGORY_NAMES: Record<string, string> = {
+    'punctuation': 'Ponctuation',
+    'spacing': 'Espacement', 
+    'quotes': 'Guillemets',
+    'symbols': 'Symboles'
+};

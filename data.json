@@ -1,11 +1,21 @@
 {
   "enableRealTimeCorrection": true,
-  "locale": "fr-FR",
+  "locale": "fr_FR",
   "fixers": {
-    "ellipsis": true,
-    "dash": true,
-    "french-spacing": true,
-    "comma": true,
+    "Ellipsis": true,
+    "Dash": true,
+    "SmartQuotes": true,
+    "CurlyQuote": true,
+    "FrenchNoBreakSpace": true,
+    "NoSpaceBeforeComma": true,
+    "Unit": true,
+    "Dimension": true,
+    "Hyphen": true,
+    "Trademark": true,
+    "ellipsis": false,
+    "dash": false,
+    "french-spacing": false,
+    "comma": false,
     "smart-quotes": false
   }
 }

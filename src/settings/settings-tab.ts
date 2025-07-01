@@ -1,7 +1,7 @@
 // src/settings/settings-tab.ts
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { TypographicFixer } from '../types/interfaces';
-import { PRESET_CONFIGURATIONS, PRESET_NAMES } from './default-settings';
+import { LOCALE_CONFIGURATIONS, LOCALE_NAMES, CATEGORY_NAMES } from './default-settings';
 import TypographyPlugin from '../main';
 
 /**
@@ -24,19 +24,15 @@ export class TypographySettingTab extends PluginSettingTab {
 
         // Description
         containerEl.createEl('p', { 
-            text: 'Plugin de correction typographique modulaire pour Obsidian. Corrige automatiquement les erreurs typographiques courantes selon les règles françaises et anglaises.',
+            text: 'Plugin de correction typographique basé sur JoliTypo. Corrige automatiquement les erreurs typographiques selon les règles françaises, anglaises et allemandes.',
             cls: 'setting-item-description'
         });
 
         // Section: Configuration générale
         this.createGeneralSettings(containerEl);
 
-        // Section: Préconfigurations
-        this.createPresetSettings(containerEl);
-
         // Section: Règles de correction
         this.createFixerSettings(containerEl);
-
 
         // Section: Actions
         this.createActionsSection(containerEl);
@@ -63,56 +59,33 @@ export class TypographySettingTab extends PluginSettingTab {
                 })
             );
 
-        // Langue
+        // Langue typographique
         new Setting(containerEl)
-            .setName('Langue')
-            .setDesc('Langue pour les règles typographiques')
-            .addDropdown(dropdown => dropdown
-                .addOption('fr-FR', 'Français (France)')
-                .addOption('fr-CA', 'Français (Canada)')
-                .addOption('en-US', 'Anglais (États-Unis)')
-                .addOption('en-GB', 'Anglais (Royaume-Uni)')
-                .setValue(this.plugin.settings.locale)
-                .onChange(async (value) => {
-                    this.plugin.settings.locale = value;
-                    await this.plugin.saveSettings();
-                    // Redessiner l'interface pour mettre à jour les exemples
-                    this.display();
-                })
-            );
-    }
+            .setName('Langue typographique')
+            .setDesc('Choisissez les règles typographiques à appliquer. Change automatiquement les fixers recommandés.')
+            .addDropdown(dropdown => {
+                // Ajouter toutes les locales disponibles
+                Object.entries(LOCALE_NAMES).forEach(([locale, name]) => {
+                    dropdown.addOption(locale, name);
+                });
+                
+                return dropdown
+                    .setValue(this.plugin.settings.locale)
+                    .onChange(async (value) => {
+                        this.plugin.settings.locale = value;
+                        this.updateFixersForLocale(value);
+                        await this.plugin.saveSettings();
+                        // Note: this.display() sera appelé dans updateFixersForLocale()
+                    });
+            });
 
-    /**
-     * Crée la section des préconfigurations
-     */
-    private createPresetSettings(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Préconfigurations' });
+        // Information sur les fixers actifs
+        const activeFixersCount = Object.values(this.plugin.settings.fixers).filter(Boolean).length;
+        const totalFixersCount = Object.keys(this.plugin.settings.fixers).length;
         
-        const presetDesc = containerEl.createEl('p', {
-            text: 'Chargez rapidement une configuration optimisée pour votre usage.',
+        containerEl.createEl('p', {
+            text: `${activeFixersCount}/${totalFixersCount} règles activées pour ${LOCALE_NAMES[this.plugin.settings.locale]}`,
             cls: 'setting-item-description'
-        });
-
-        // Boutons de préconfigurations
-        const presetContainer = containerEl.createDiv({ cls: 'typography-preset-container' });
-        
-        Object.entries(PRESET_CONFIGURATIONS).forEach(([key, config]) => {
-            const button = presetContainer.createEl('button', {
-                text: PRESET_NAMES[key as keyof typeof PRESET_NAMES],
-                cls: 'mod-cta'
-            });
-            
-            button.addEventListener('click', async () => {
-                // Appliquer la préconfiguration
-                this.plugin.settings = { ...config };
-                await this.plugin.saveSettings();
-                
-                // Redessiner l'interface
-                this.display();
-                
-                // Notification
-                new (window as any).Notice(`Configuration "${PRESET_NAMES[key as keyof typeof PRESET_NAMES]}" appliquée`);
-            });
         });
     }
 
@@ -122,7 +95,7 @@ export class TypographySettingTab extends PluginSettingTab {
     private createFixerSettings(containerEl: HTMLElement): void {
         containerEl.createEl('h3', { text: 'Règles de correction' });
         containerEl.createEl('p', { 
-            text: 'Activez ou désactivez les règles typographiques selon vos besoins.',
+            text: 'Activez ou désactivez les règles typographiques selon vos besoins. Les règles recommandées pour votre langue sont activées automatiquement.',
             cls: 'setting-item-description'
         });
 
@@ -133,18 +106,11 @@ export class TypographySettingTab extends PluginSettingTab {
             return acc;
         }, {} as Record<string, TypographicFixer[]>);
 
-        const categoryNames = {
-            punctuation: 'Ponctuation',
-            spacing: 'Espacement',
-            symbols: 'Symboles',
-            quotes: 'Guillemets'
-        };
-
         // Créer les paramètres pour chaque catégorie
         Object.entries(fixersByCategory).forEach(([category, fixers]) => {
             // Titre de catégorie avec contrôle global
             const categoryHeader = containerEl.createEl('h4', { 
-                text: categoryNames[category as keyof typeof categoryNames] || category,
+                text: CATEGORY_NAMES[category] || category,
                 cls: 'typography-category-header'
             });
 
@@ -179,6 +145,15 @@ export class TypographySettingTab extends PluginSettingTab {
                         })
                     );
 
+                // Ajouter un badge si c'est recommandé pour la locale actuelle
+                const isRecommended = this.isFixerRecommendedForCurrentLocale(fixer.id);
+                if (isRecommended) {
+                    const badge = setting.nameEl.createEl('span', {
+                        text: 'Recommandé',
+                        cls: 'typography-recommended-badge'
+                    });
+                }
+
                 // Ajouter un exemple si disponible
                 if (fixer.getExample) {
                     const example = fixer.getExample();
@@ -194,66 +169,81 @@ export class TypographySettingTab extends PluginSettingTab {
         });
     }
 
- 
-
     /**
      * Crée la section des actions
      */
     private createActionsSection(containerEl: HTMLElement): void {
         containerEl.createEl('h3', { text: 'Actions' });
 
-        // Bouton de test
+        
+        // Section: Actions (simplifiée)
         new Setting(containerEl)
-            .setName('Tester les corrections')
-            .setDesc('Teste les règles actives sur un texte d\'exemple')
+            .setName('Restaurer la configuration recommandée')
+            .setDesc(`Active les fixers recommandés pour ${LOCALE_NAMES[this.plugin.settings.locale]}`)
             .addButton(button => button
-                .setButtonText('Tester')
-                .onClick(() => {
-                    this.showTestModal();
+                .setButtonText('Restaurer')
+                .onClick(async () => {
+                    this.updateFixersForLocale(this.plugin.settings.locale);
+                    await this.plugin.saveSettings();
+                    new Notice('Configuration restaurée');
                 })
             );
 
-        // Bouton de réinitialisation
-        new Setting(containerEl)
-            .setName('Réinitialiser la configuration')
-            .setDesc('Remet tous les paramètres à leur valeur par défaut')
-            .addButton(button => button
-                .setButtonText('Réinitialiser')
-                .setWarning()
-                .onClick(async () => {
-                    this.plugin.engine.resetToDefaults();
-                    await this.plugin.saveSettings();
-                    this.display();
-                    new (window as any).Notice('Configuration réinitialisée');
-                })
-            );
     }
 
     /**
-     * Crée une carte de statistique
+     * Met à jour les fixers actifs selon la locale choisie
      */
-    private createStatCard(container: HTMLElement, label: string, value: string): void {
-        const card = container.createDiv({ cls: 'typography-stat-card' });
-        card.createEl('span', { text: value, cls: 'typography-stat-number' });
-        card.createEl('span', { text: label, cls: 'typography-stat-label' });
+    private updateFixersForLocale(locale: string): void {
+        const activeFixers = LOCALE_CONFIGURATIONS[locale];
+        if (activeFixers) {
+            // Désactiver tous les fixers d'abord
+            Object.keys(this.plugin.settings.fixers).forEach((fixerId: string) => {
+                this.plugin.settings.fixers[fixerId] = false;
+            });
+            
+            // Activer les fixers recommandés pour cette locale
+            activeFixers.forEach((fixerId: string) => {
+                this.plugin.settings.fixers[fixerId] = true;
+            });
+            
+            // Redessiner l'interface pour refléter les changements
+            this.display();
+        }
+    }
+
+    /**
+     * Vérifie si un fixer est recommandé pour la locale actuelle
+     */
+    private isFixerRecommendedForCurrentLocale(fixerId: string): boolean {
+        const recommendedFixers = LOCALE_CONFIGURATIONS[this.plugin.settings.locale];
+        return recommendedFixers ? recommendedFixers.includes(fixerId) : false;
     }
 
     /**
      * Affiche une modal de test des corrections
      */
     private showTestModal(): void {
-        const testText = `Voici un test... avec des "guillemets", des espaces avant ! Et des tirets -- pour voir.`;
+        const testText = `Voici un test... avec des "guillemets", des espaces avant ! Et des tirets -- pour voir. I'm testing (c) 2025.`;
         const corrected = this.plugin.engine.processText(testText);
         
         const modal = new (window as any).Modal(this.app);
         modal.setTitle('Test des corrections');
         
         const content = modal.contentEl;
+        
         content.createEl('h4', { text: 'Texte original :' });
         content.createEl('pre', { text: testText, cls: 'typography-test-original' });
         
         content.createEl('h4', { text: 'Texte corrigé :' });
         content.createEl('pre', { text: corrected, cls: 'typography-test-corrected' });
+        
+        if (testText === corrected) {
+            content.createEl('p', { 
+                text: '⚠️ Aucune correction appliquée. Vérifiez que les fixers sont activés.',
+                cls: 'typography-no-changes'
+            });
+        }
         
         modal.open();
     }
@@ -265,18 +255,6 @@ export class TypographySettingTab extends PluginSettingTab {
         if (!containerEl.querySelector('.typography-custom-styles')) {
             const style = containerEl.createEl('style', { cls: 'typography-custom-styles' });
             style.textContent = `
-                .typography-preset-container {
-                    display: flex;
-                    gap: 8px;
-                    margin: 12px 0;
-                    flex-wrap: wrap;
-                }
-                
-                .typography-preset-container button {
-                    padding: 8px 16px;
-                    border-radius: 4px;
-                }
-                
                 .typography-category-header {
                     display: flex;
                     justify-content: space-between;
@@ -290,30 +268,52 @@ export class TypographySettingTab extends PluginSettingTab {
                 .typography-toggle-category {
                     font-size: 0.8em;
                     padding: 4px 8px;
+                    border-radius: 4px;
                 }
                 
-
+                .typography-recommended-badge {
+                    display: inline-block;
+                    background: var(--color-accent);
+                    color: var(--text-on-accent);
+                    font-size: 0.7em;
+                    padding: 2px 6px;
+                    border-radius: 10px;
+                    margin-left: 8px;
+                    font-weight: 500;
+                }
                 
-                .typography-stat-card {
-                    background: var(--background-secondary);
+                .typography-example {
+                    margin-top: 12px;
                     padding: 12px;
-                    border-radius: 6px;
-                    text-align: center;
+                    background: var(--background-primary);
                     border: 1px solid var(--background-modifier-border);
+                    border-radius: 6px;
+                    font-size: 0.85em;
+                    line-height: 1.4;
                 }
                 
-                .typography-stat-number {
-                    font-size: 1.5em;
+                .typography-example-label {
                     font-weight: 600;
-                    color: var(--color-accent);
-                    display: block;
+                    color: var(--text-accent);
+                    margin-right: 6px;
                 }
                 
-                .typography-stat-label {
-                    font-size: 0.8em;
-                    color: var(--text-muted);
-                    margin-top: 4px;
-                    display: block;
+                .typography-example code {
+                    background: var(--background-modifier-form-field);
+                    color: var(--text-normal);
+                    padding: 3px 6px;
+                    border-radius: 4px;
+                    font-family: var(--font-monospace);
+                    font-size: 0.9em;
+                    border: 1px solid var(--background-modifier-border-hover);
+                }
+                
+                .typography-example-before {
+                    margin-bottom: 6px;
+                }
+                
+                .typography-example-after {
+                    margin-top: 6px;
                 }
                 
                 .typography-test-original,
@@ -322,6 +322,15 @@ export class TypographySettingTab extends PluginSettingTab {
                     padding: 12px;
                     border-radius: 4px;
                     margin: 8px 0;
+                    font-family: var(--font-monospace);
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                }
+                
+                .typography-no-changes {
+                    color: var(--text-warning);
+                    font-style: italic;
+                    margin-top: 12px;
                 }
             `;
         }

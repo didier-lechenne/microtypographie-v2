@@ -9,49 +9,33 @@ export const UNICODE_CHARS = {
     // ESPACES SPÉCIAUX
     // ========================
     
-    /** Espace fine insécable (U+202F) - Utilisée avant ; ! ? en français */
-    NO_BREAK_THIN_SPACE: '\u202F',
-    
-    /** Espace insécable (U+00A0) - Utilisée avant : en français */
-    NO_BREAK_SPACE: '\u00A0',
-    
-    /** Espace normale (pour référence) */
-    NORMAL_SPACE: ' ',
+    NO_BREAK_THIN_SPACE: '\u202F', /** Espace fine insécable (U+202F) - Utilisée avant ; ! ? en français */
+    NO_BREAK_SPACE: '\u00A0', /** Espace insécable (U+00A0) - Utilisée avant : en français */
+    NORMAL_SPACE: ' ', /** Espace normale (pour référence) */
 
     // ========================
     // PONCTUATION
     // ========================
     
-    /** Points de suspension (U+2026) - Remplace ... */
-    ELLIPSIS: '…',
-    
-    /** Tiret demi-cadratin (U+2013) - Pour les plages de nombres */
-    NDASH: '–',
-    
-    /** Tiret cadratin (U+2014) - Pour les incises en français */
-    MDASH: '—',
+    ELLIPSIS: '…', /** Points de suspension (U+2026) - Remplace ... */
+    NDASH: '–', /** Tiret demi-cadratin (U+2013) - Pour les plages de nombres */
+    MDASH: '—', /** Tiret cadratin (U+2014) - Pour les incises en français */
 
     // ========================
     // GUILLEMETS ET APOSTROPHES
     // ========================
+
+    LDQUO: '“',  /** Guillemet ouvrant anglais (U+201C) */
+    RDQUO: '”',  /** Guillemet fermant anglais (U+201D) */
     
-    /** Guillemet ouvrant anglais (U+201C) */
-    LDQUO: '"',
-    
-    /** Guillemet fermant anglais (U+201D) */
-    RDQUO: '"',
-    
-    /** Apostrophe ouvrante (U+2018) - Rarement utilisée */
-    LSQUO: '“',
-    
-    /** Apostrophe fermante/typographique (U+2019) - Remplace ' */
-    RSQUO: '”',
-    
-    /** Guillemet français ouvrant (U+00AB) */
-    LAQUO: '«',
-    
-    /** Guillemet français fermant (U+00BB) */
-    RAQUO: '»',
+    LSQUO: '“', /** Apostrophe ouvrante (U+2018) - Rarement utilisée */
+
+    RSQUO: '’', /** Apostrophe fermante/typographique (U+2019) - Remplace ' */
+    LAQUO: '«', /** Guillemet français ouvrant (U+00AB) */
+    RAQUO: '»', /** Guillemet français fermant (U+00BB) */
+
+    BDQUO: '„', // &bdquo; or &#8222;
+    SHY: "\xC2\xAD", // &shy;
 
     // ========================
     // SYMBOLES MATHÉMATIQUES
