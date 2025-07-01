@@ -193,13 +193,7 @@
     margin-bottom: 4px;
 }
 
-/* Styles pour la section des statistiques */
-.typography-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px;
-    margin: 16px 0;
-}
+
 
 .typography-stat-card {
     background: var(--background-secondary);
@@ -233,9 +227,7 @@
         font-size: 0.8em;
     }
     
-    .typography-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
+
     
     .typography-fixer-setting {
         padding: 8px;

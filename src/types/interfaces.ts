@@ -80,23 +80,10 @@ export interface TypographySettings {
     /** Langue pour les règles typographiques */
     locale: string;
     
-    /** Statistiques d'utilisation (optionnel) */
-    stats?: TypographyStats;
+
 }
 
-/**
- * Statistiques d'utilisation du plugin
- */
-export interface TypographyStats {
-    /** Nombre total de corrections appliquées */
-    totalCorrections: number;
-    
-    /** Corrections par type de fixer */
-    correctionsByFixer: Record<string, number>;
-    
-    /** Dernière utilisation */
-    lastUsed: number;
-}
+
 
 /**
  * Configuration d'un fixer regroupée

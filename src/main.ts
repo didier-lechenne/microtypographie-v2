@@ -117,15 +117,7 @@ export default class TypographyPlugin extends Plugin {
             }
         });
 
-        // Commande: Afficher les statistiques
-        this.addCommand({
-            id: 'show-stats',
-            name: 'Afficher les statistiques',
-            icon: 'bar-chart',
-            callback: () => {
-                this.showStats();
-            }
-        });
+
     }
 
     /**
@@ -140,7 +132,6 @@ export default class TypographyPlugin extends Plugin {
             editor.replaceSelection(result.corrected);
             
             this.showCorrectionNotice(result.correctionsCount, result.fixersUsed);
-            this.updateStats(result.correctionsCount, result.fixersUsed);
         } else {
             // Aucune sélection, corriger toute la note
             this.correctEntireNote(editor);
@@ -157,7 +148,6 @@ export default class TypographyPlugin extends Plugin {
         if (result.corrected !== content) {
             editor.setValue(result.corrected);
             this.showCorrectionNotice(result.correctionsCount, result.fixersUsed);
-            this.updateStats(result.correctionsCount, result.fixersUsed);
         } else {
             new Notice('Aucune correction nécessaire', 2000);
         }
@@ -174,53 +164,6 @@ export default class TypographyPlugin extends Plugin {
         new Notice(`Correction temps réel ${status}`, 3000);
     }
 
-    /**
-     * Affiche les statistiques
-     */
-    private showStats(): void {
-        const stats = this.engine.getStats();
-        const userStats = this.settings.stats;
-        
-        let message = `📊 Statistiques Typography Fixers\n\n`;
-        message += `• Fixers actifs: ${stats.enabledFixers}/${stats.totalFixers}\n`;
-        
-        if (userStats) {
-            message += `• Corrections totales: ${userStats.totalCorrections}\n`;
-            
-            if (userStats.lastUsed) {
-                const lastUsed = new Date(userStats.lastUsed).toLocaleDateString();
-                message += `• Dernière utilisation: ${lastUsed}\n`;
-            }
-        }
-        
-        new Notice(message, 8000);
-    }
-
-    /**
-     * Met à jour les statistiques d'utilisation
-     */
-    private updateStats(correctionsCount: number, fixersUsed: string[]): void {
-        if (!this.settings.stats) {
-            this.settings.stats = {
-                totalCorrections: 0,
-                correctionsByFixer: {},
-                lastUsed: Date.now()
-            };
-        }
-
-        // Mettre à jour les statistiques
-        this.settings.stats.totalCorrections += correctionsCount;
-        this.settings.stats.lastUsed = Date.now();
-
-        // Compter les corrections par fixer
-        fixersUsed.forEach(fixerId => {
-            this.settings.stats!.correctionsByFixer[fixerId] = 
-                (this.settings.stats!.correctionsByFixer[fixerId] || 0) + 1;
-        });
-
-        // Sauvegarder en arrière-plan
-        this.saveSettings();
-    }
 
     /**
      * Affiche une notification de correction
@@ -262,9 +205,7 @@ export default class TypographyPlugin extends Plugin {
         // Déléguer au moteur typographique
         if (this.engine.handleKeyEvent(event, editor)) {
             event.preventDefault();
-            
-            // Mettre à jour les statistiques pour les corrections temps réel
-            this.updateStats(1, ['real-time']);
+
         }
     }
 

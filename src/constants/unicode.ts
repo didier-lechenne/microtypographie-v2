@@ -65,6 +65,9 @@ export const UNICODE_CHARS = {
     
     /** Symbole plus ou moins (U+00B1) */
     PLUS_MINUS: '±',
+    
+    /** Symbole moins (U+2212) - Plus long que le trait d'union standard */
+    MINUS: '−',
 
     // ========================
     // SYMBOLES DE MARQUE
@@ -83,9 +86,6 @@ export const UNICODE_CHARS = {
     // AUTRES SYMBOLES UTILES
     // ========================
     
-    /** Degré (U+00B0) */
-    DEGREE: '°',
-    
     /** Prime (U+2032) - Minutes, pieds */
     PRIME: '′',
     
@@ -98,36 +98,30 @@ export const UNICODE_CHARS = {
     /** Paragraphe (U+00B6) */
     PARAGRAPH: '¶',
     
+    /** Puce (U+2022) */
+    BULLET: '•',
+    
+    /** Flèche droite (U+2192) */
+    ARROW_RIGHT: '→',
+    
+    /** Flèche gauche (U+2190) */
+    ARROW_LEFT: '←',
+    
+    /** Euro (U+20AC) */
+    EURO: '€',
+    
+    /** Livre sterling (U+00A3) */
+    POUND: '£',
+    
+    /** Yen (U+00A5) */
+    YEN: '¥',
+    
 } as const;
 
 /**
  * Type des clés de caractères Unicode
  */
 export type UnicodeCharKey = keyof typeof UNICODE_CHARS;
-
-/**
- * Raccourcis pour les caractères les plus utilisés
- */
-export const QUICK_CHARS = {
-    /** Espace fine insécable - usage principal en français */
-    NBSP_THIN: UNICODE_CHARS.NO_BREAK_THIN_SPACE,
-    
-    /** Espace insécable - usage avant les deux-points */
-    NBSP: UNICODE_CHARS.NO_BREAK_SPACE,
-    
-    /** Ellipse typographique */
-    ELLIPSIS: UNICODE_CHARS.ELLIPSIS,
-    
-    /** Tiret long français */
-    DASH_FR: UNICODE_CHARS.MDASH,
-    
-    /** Tiret court pour les plages */
-    DASH_EN: UNICODE_CHARS.NDASH,
-    
-    /** Apostrophe typographique */
-    APOSTROPHE: UNICODE_CHARS.RSQUO,
-    
-} as const;
 
 /**
  * Patterns regex utiles pour la détection
@@ -148,4 +142,16 @@ export const UNICODE_PATTERNS = {
     /** Détecte les apostrophes droites dans les contractions */
     STRAIGHT_APOSTROPHES: /(\w)'/g,
     
+    /** Détecte x entre nombres pour multiplication */
+    MULTIPLY_X: /(\d+)\s*[xX]\s*(\d+)/g,
+    
+    /** Détecte * entre nombres pour multiplication */
+    MULTIPLY_STAR: /(\d+)\s*\*\s*(\d+)/g,
+    
+    /** Détecte les symboles de marque textuels */
+    TRADEMARK_TEXT: /\(tm\)/gi,
+    REGISTERED_TEXT: /\(r\)/gi,
+    COPYRIGHT_TEXT: /\(c\)/gi,
+    
 } as const;
+

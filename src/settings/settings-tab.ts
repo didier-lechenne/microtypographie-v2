@@ -37,8 +37,6 @@ export class TypographySettingTab extends PluginSettingTab {
         // Section: Règles de correction
         this.createFixerSettings(containerEl);
 
-        // Section: Statistiques
-        this.createStatsSection(containerEl);
 
         // Section: Actions
         this.createActionsSection(containerEl);
@@ -196,48 +194,7 @@ export class TypographySettingTab extends PluginSettingTab {
         });
     }
 
-    /**
-     * Crée la section des statistiques
-     */
-    private createStatsSection(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Statistiques' });
-
-        const stats = this.plugin.engine.getStats();
-        const settings = this.plugin.settings;
-
-        // Statistiques générales
-        const statsContainer = containerEl.createDiv({ cls: 'typography-stats' });
-
-        this.createStatCard(statsContainer, 'Fixers actifs', `${stats.enabledFixers}/${stats.totalFixers}`);
-        
-        if (settings.stats) {
-            this.createStatCard(statsContainer, 'Corrections totales', settings.stats.totalCorrections.toString());
-            
-            const lastUsed = settings.stats.lastUsed ? 
-                new Date(settings.stats.lastUsed).toLocaleDateString() : 
-                'Jamais';
-            this.createStatCard(statsContainer, 'Dernière utilisation', lastUsed);
-        }
-
-        // Bouton de réinitialisation des statistiques
-        new Setting(containerEl)
-            .setName('Réinitialiser les statistiques')
-            .setDesc('Remet à zéro toutes les statistiques d\'utilisation')
-            .addButton(button => button
-                .setButtonText('Réinitialiser')
-                .setWarning()
-                .onClick(async () => {
-                    if (this.plugin.settings.stats) {
-                        this.plugin.settings.stats.totalCorrections = 0;
-                        this.plugin.settings.stats.correctionsByFixer = {};
-                        this.plugin.settings.stats.lastUsed = Date.now();
-                    }
-                    await this.plugin.saveSettings();
-                    this.display();
-                    new (window as any).Notice('Statistiques réinitialisées');
-                })
-            );
-    }
+ 
 
     /**
      * Crée la section des actions
@@ -335,12 +292,7 @@ export class TypographySettingTab extends PluginSettingTab {
                     padding: 4px 8px;
                 }
                 
-                .typography-stats {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                    gap: 12px;
-                    margin: 16px 0;
-                }
+
                 
                 .typography-stat-card {
                     background: var(--background-secondary);

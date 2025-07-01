@@ -215,26 +215,5 @@ export class TypographyEngine {
         }
     }
 
-    /**
-     * Retourne des statistiques sur l'utilisation des fixers
-     */
-    public getStats(): {
-        totalFixers: number;
-        enabledFixers: number;
-        categoriesCount: Record<string, number>;
-    } {
-        const allFixers = this.getFixers();
-        const enabledFixers = this.getEnabledFixers();
-        
-        const categoriesCount: Record<string, number> = {};
-        allFixers.forEach(fixer => {
-            categoriesCount[fixer.category] = (categoriesCount[fixer.category] || 0) + 1;
-        });
 
-        return {
-            totalFixers: allFixers.length,
-            enabledFixers: enabledFixers.length,
-            categoriesCount
-        };
-    }
 }

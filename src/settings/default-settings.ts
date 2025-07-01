@@ -23,12 +23,7 @@ export const DEFAULT_SETTINGS: TypographySettings = {
         'math-symbols': false,   // Symboles mathématiques et de marque
     },
     
-    // Statistiques d'utilisation (optionnel)
-    stats: {
-        totalCorrections: 0,
-        correctionsByFixer: {},
-        lastUsed: Date.now()
-    }
+
 };
 
 /**
@@ -44,11 +39,6 @@ export const ENGLISH_SETTINGS: TypographySettings = {
         'no-space-comma': true,
         'smart-quotes': true,
         'math-symbols': false,
-    },
-    stats: {
-        totalCorrections: 0,
-        correctionsByFixer: {},
-        lastUsed: Date.now()
     }
 };
 
@@ -107,13 +97,7 @@ export function validateSettings(settings: Partial<TypographySettings>): Typogra
     const validated: TypographySettings = {
         enableRealTimeCorrection: settings.enableRealTimeCorrection ?? DEFAULT_SETTINGS.enableRealTimeCorrection,
         locale: settings.locale ?? DEFAULT_SETTINGS.locale,
-        fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers },
-        stats: {
-            totalCorrections: 0,
-            correctionsByFixer: {},
-            lastUsed: Date.now(),
-            ...settings.stats
-        }
+        fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
     };
 
     // Assurer que tous les fixers ont une valeur booléenne
