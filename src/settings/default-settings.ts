@@ -7,6 +7,9 @@ import { TypographySettings } from '../types/interfaces';
 export const DEFAULT_SETTINGS: TypographySettings = {
     enableRealTimeCorrection: true,
     locale: 'fr_FR',
+    highlightEnabled: false,        
+    highlightButton: true,          
+    tabTitleBarButton: false,       
     fixers: {
         // Fixers JoliTypo - IDs exacts
         'Ellipsis': true,                // Points de suspension : ... → …
@@ -93,6 +96,9 @@ export function createSettingsForLocale(locale: string): TypographySettings {
     const settings: TypographySettings = {
         enableRealTimeCorrection: true,
         locale: locale,
+        highlightEnabled: false,
+        highlightButton: true,
+        tabTitleBarButton: false,
         fixers: {}
     };
 
@@ -116,6 +122,9 @@ export function validateSettings(settings: Partial<TypographySettings>): Typogra
     const validated: TypographySettings = {
         enableRealTimeCorrection: settings.enableRealTimeCorrection ?? DEFAULT_SETTINGS.enableRealTimeCorrection,
         locale: settings.locale ?? DEFAULT_SETTINGS.locale,
+        highlightEnabled: settings.highlightEnabled ?? DEFAULT_SETTINGS.highlightEnabled,
+        highlightButton: settings.highlightButton ?? DEFAULT_SETTINGS.highlightButton,
+        tabTitleBarButton: settings.tabTitleBarButton ?? DEFAULT_SETTINGS.tabTitleBarButton,
         fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
     };
 
