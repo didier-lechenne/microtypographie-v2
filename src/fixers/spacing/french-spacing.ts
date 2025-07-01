@@ -40,7 +40,7 @@ export class FrenchNoBreakSpace extends BaseFixer {
             // Espace insécable après «
             {
                 pattern: /(«)\s*/g,
-                replacement: `$1${UNICODE_CHARS.NO_BREAK_SPACE}`
+                replacement: `$1${UNICODE_CHARS.NO_BREAK_THIN_SPACE}`
             },
             // Corriger les espaces dans les nombres (optionnel)
             {

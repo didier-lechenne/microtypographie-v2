@@ -1,0 +1,557 @@
+
+/* ========================================
+   MICROTYPOGRAPHIE OBSIDIAN - STYLES OPTIMISÉS
+   ======================================== */
+
+/* ========================================
+   VARIABLES CSS
+   ======================================== */
+:root {
+    --space-size: 1em;
+    --space-opacity: 0.8;
+}
+
+/* Couleurs thème clair */
+.theme-light {
+    --color-nonBreakingSpace: rgba(225, 138, 232, 0.9);
+    --color-thin-space: rgba(109, 255, 73, 0.9);
+    --color-regular-space: rgba(75, 167, 209, 0.9);
+}
+
+/* Couleurs thème sombre */
+.theme-dark {
+    --color-nonBreakingSpace: rgb(248, 116, 215);
+    --color-thin-space: rgba(63, 226, 255, 0.9);
+    --color-regular-space: rgba(175, 140, 166, 0.9);
+}
+
+
+
+
+/* Styles communs pour tous les caractères invisibles */
+.cm-line .nonBreakingSpace,
+.cm-line .thinSpace,
+.cm-line .regularSpace,
+.cm-line .em-dash,
+.cm-line .tab-char,
+.cm-line .line-break {
+    position: relative;
+}
+
+/* ===== ESPACE INSÉCABLE (U+00A0) ===== */
+
+
+/* Fallback si le caractère ⍽ n'est pas disponible */
+.cm-line .nonBreakingSpace::before {
+    content: '\E0A0';  
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-nonBreakingSpace);
+    /* font-size: calc(var(--space-size) ); */
+    font-family: "hidden-characters";
+    pointer-events: none;
+    line-height: 100%;
+    vertical-align: bottom;
+    opacity: var(--space-opacity);
+}
+
+/* ===== ESPACE FINE INSÉCABLE (U+202F) ===== */
+.cm-line .thinSpace::after {
+    content: '\E209'; 
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-77%, -40%);
+    color: var(--color-thin-space);
+    font-family: "hidden-characters";
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+}
+
+/* Fallback pour espace fine */
+
+
+/* ===== ESPACE NORMALE (U+0020) ===== */
+.cm-line .regularSpace::after {
+    content: '·';  /* U+00B7 - Middle dot */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-regular-space);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+}
+
+
+
+/* ===== TABULATION (U+0009) ===== */
+.cm-line .tab-char::after {
+    content: '→';  /* U+2192 - Rightwards arrow */
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-tab);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+}
+
+/* Fallback pour la flèche */
+.cm-line .tab-char::before {
+    content: '»';  /* U+00BB - Right-pointing double angle quotation mark */
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-tab);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    z-index: -1;
+}
+
+/* ===== SAUT DE LIGNE ===== */
+.cm-line .line-break::after {
+    content: '¶';  /* U+00B6 - Pilcrow sign */
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-line-break);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+}
+
+/* Fallback pour le pilcrow */
+.cm-line .line-break::before {
+    content: '↵';  /* U+21B5 - Downwards arrow with corner leftwards */
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-line-break);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    z-index: -1;
+}
+
+/* ========================================
+   BOUTON DE CONTRÔLE - BARRE D'ÉTAT
+   ======================================== */
+
+/* Bouton d'activation/désactivation dans la barre d'état */
+#highlight-status-bar-button {
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+#highlight-status-bar-button:hover {
+    opacity: 0.8;
+}
+
+#highlight-status-bar-button.highlight-enabled {
+    opacity: 1;
+}
+
+#highlight-status-bar-button .status-bar-item-icon {
+    font-weight: bold;
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+}
+
+/* Couleurs spécifiques selon le thème */
+.theme-dark #highlight-status-bar-button.highlight-enabled {
+    color: var(--interactive-accent);
+}
+
+.theme-light #highlight-status-bar-button.highlight-enabled {
+    color: var(--interactive-accent);
+}
+
+/* ========================================
+   BOUTON DANS LA BARRE DE TITRE
+   ======================================== */
+
+/* Bouton d'activation dans la barre de titre des onglets */
+#highlight-tab-title-button {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    margin-right: 8px;
+}
+
+#highlight-tab-title-button:hover {
+    opacity: 0.9;
+}
+
+#highlight-tab-title-button.highlight-enabled {
+    opacity: 1;
+    color: var(--interactive-accent);
+}
+
+
+
+
+/* Styles pour l'interface de paramètres */
+.typography-settings-container {
+    padding: 20px;
+}
+
+.typography-category-header {
+    margin-top: 24px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    color: var(--text-accent);
+    font-weight: 600;
+}
+
+.typography-fixer-setting {
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--background-secondary);
+    transition: background-color 0.2s ease;
+}
+
+.typography-fixer-setting:hover {
+    background: var(--background-modifier-hover);
+}
+
+.typography-fixer-setting .setting-item-name {
+    font-weight: 500;
+    color: var(--text-normal);
+}
+
+.typography-fixer-setting .setting-item-description {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+/* Styles pour les exemples */
+.typography-example {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.typography-example-label {
+    font-weight: 600;
+    color: var(--text-accent);
+    margin-right: 6px;
+}
+
+.typography-example code {
+    background: var(--background-modifier-form-field);
+    color: var(--text-normal);
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: var(--font-monospace);
+    font-size: 0.9em;
+    border: 1px solid var(--background-modifier-border-hover);
+}
+
+.typography-example-before {
+    margin-bottom: 6px;
+}
+
+.typography-example-after {
+    margin-top: 6px;
+}
+
+/* Styles pour les notifications */
+.typography-notification {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 8px 0;
+    font-size: 0.9em;
+}
+
+.typography-notification.success {
+    background: var(--background-modifier-success);
+    color: var(--text-success);
+    border: 1px solid var(--color-green);
+}
+
+.typography-notification.warning {
+    background: var(--background-modifier-warning);
+    color: var(--text-warning);
+    border: 1px solid var(--color-orange);
+}
+
+.typography-notification-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* Styles pour les badges de catégorie */
+.typography-category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 500;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.typography-category-badge.punctuation {
+    background: var(--color-blue-rgb);
+    color: white;
+}
+
+.typography-category-badge.spacing {
+    background: var(--color-green-rgb);
+    color: white;
+}
+
+.typography-category-badge.symbols {
+    background: var(--color-purple-rgb);
+    color: white;
+}
+
+.typography-category-badge.quotes {
+    background: var(--color-orange-rgb);
+    color: white;
+}
+
+/* Styles pour les toggles personnalisés */
+.typography-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.typography-toggle-label {
+    font-size: 0.9em;
+    color: var(--text-muted);
+}
+
+/* Animations pour les corrections en temps réel */
+@keyframes typography-correction {
+    0% {
+        background: var(--color-accent);
+        opacity: 0.3;
+    }
+    100% {
+        background: transparent;
+        opacity: 0;
+    }
+}
+
+.typography-corrected {
+    animation: typography-correction 0.5s ease-out;
+}
+
+/* Styles pour les sections d'aide */
+.typography-help-section {
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--background-secondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--color-accent);
+}
+
+.typography-help-title {
+    font-weight: 600;
+    color: var(--text-accent);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.typography-help-content {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.typography-help-content ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.typography-help-content li {
+    margin-bottom: 4px;
+}
+
+
+
+.typography-stat-card {
+    background: var(--background-secondary);
+    padding: 12px;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid var(--background-modifier-border);
+}
+
+.typography-stat-number {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: var(--color-accent);
+    display: block;
+}
+
+.typography-stat-label {
+    font-size: 0.8em;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+    .typography-settings-container {
+        padding: 12px;
+    }
+    
+    .typography-example {
+        padding: 8px;
+        font-size: 0.8em;
+    }
+    
+
+    
+    .typography-fixer-setting {
+        padding: 8px;
+    }
+}
+
+/* Styles pour les modes sombre/clair */
+.theme-dark .typography-example {
+    background: var(--background-primary-alt);
+}
+
+.theme-light .typography-example {
+    background: var(--background-secondary-alt);
+}
+
+/* Styles pour l'accessibilité */
+.typography-fixer-setting:focus-within {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.typography-example code:focus {
+    outline: 1px solid var(--color-accent);
+    outline-offset: 1px;
+}
+
+/* Styles pour les transitions fluides */
+* {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Styles pour les tooltips */
+.typography-tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.typography-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--background-tooltip);
+    color: var(--text-on-accent);
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1000;
+}
+
+.typography-tooltip:hover::after {
+    opacity: 1;
+}
+
+
+/* Caractères invisibles - cachés par défaut */
+.cm-line .nonBreakingSpace::before,
+.cm-line .thinSpace::after,
+.cm-line .regularSpace::after,
+.cm-line .tab-char::after,
+.cm-line .line-break::after {
+    display: none;
+}
+
+/* Affichage des caractères invisibles quand la classe est active */
+.typography-show-invisible .cm-line .nonBreakingSpace::before {
+    content: '\E0A0';  
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-nonBreakingSpace);
+    font-family: "hidden-characters";
+    pointer-events: none;
+    line-height: 100%;
+    vertical-align: bottom;
+    opacity: var(--space-opacity);
+    display: block;
+}
+
+.typography-show-invisible .cm-line .thinSpace::after {
+    content: '\E209'; 
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-77%, -40%);
+    color: var(--color-thin-space);
+    font-family: "hidden-characters";
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    display: block;
+}
+
+.typography-show-invisible .cm-line .regularSpace::after {
+    content: '·';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-regular-space);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    display: block;
+}
+
