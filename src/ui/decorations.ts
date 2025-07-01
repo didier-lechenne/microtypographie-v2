@@ -1,30 +1,25 @@
 import { EditorView, Decoration, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
-import { DEFAULT_SETTINGS } from '../settings/default-settings';
-
+import { TypographySettings } from '../types/interfaces';
 
 /**
  * Crée les décorations visuelles pour les caractères spéciaux
- * @param settings Paramètres du plugin
- * @returns Extension pour l'éditeur CodeMirror
+ * Les spans sont TOUJOURS générés, l'affichage est contrôlé par CSS
  */
-export function createDecorations(settings: MicrotypographieSettings) {
-    // Décoration pour l'espace insécable normale
+export function createDecorations(settings: TypographySettings) {
+    // Décorations (toujours actives pour générer les spans)
     const nonBreakingSpaceDecoration = Decoration.mark({
         class: 'nonBreakingSpace'
     });
 
-    // Décoration pour l'espace fine insécable
     const thinSpaceDecoration = Decoration.mark({
         class: 'thinSpace'
     });
 
-    // Décoration pour le tiret cadratin
     const emDashDecoration = Decoration.mark({
         class: 'em-dash'
     });
 
-    // Décoration pour l'espace normale
     const regularSpaceDecoration = Decoration.mark({
         class: 'regularSpace'
     });
@@ -45,68 +40,57 @@ export function createDecorations(settings: MicrotypographieSettings) {
         buildDecorations(view: EditorView) {
             const builder = new RangeSetBuilder<Decoration>();
             
-            // Appliquer les décorations uniquement si la mise en évidence est activée
-            if (settings.highlightEnabled) {
-                for (let { from, to } of view.visibleRanges) {
-                    let text = view.state.doc.sliceString(from, to);
-                    let documentText = view.state.doc.toString();
+            // TOUJOURS générer les spans (pas de condition sur highlightEnabled)
+            for (let { from, to } of view.visibleRanges) {
+                let text = view.state.doc.sliceString(from, to);
+                
+                let startPos = from;
+                let inFrontmatter = false;
+                let inCodeBlock = false;
+                let lineStart = true;
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    const pos = startPos + i;
                     
-                    // Position de départ pour le traitement du texte
-                    let startPos = from;
+                    // Détection du frontmatter
+                    if (lineStart && text.substr(i, 3) === '---') {
+                        inFrontmatter = !inFrontmatter;
+                        i += 2;
+                        lineStart = false;
+                        continue;
+                    }
                     
-                    // Analyser le texte pour détecter les frontmatter et blocs de code
-                    let inFrontmatter = false;
-                    let inCodeBlock = false;
-                    let lineStart = true; // Pour détecter le début d'une ligne
+                    // Détection des blocs de code
+                    if (lineStart && text.substr(i, 3) === '```') {
+                        inCodeBlock = !inCodeBlock;
+                        i += 2;
+                        lineStart = false;
+                        continue;
+                    }
                     
-                    for (let i = 0; i < text.length; i++) {
-                        const char = text[i];
-                        const pos = startPos + i;
-                        
-                        // Obtenir la position de ligne actuelle
-                        const currentPos = view.state.doc.lineAt(pos);
-                        const lineNumber = currentPos.number - 1; // Les lignes commencent à 1 dans CodeMirror
-                        
-                        // Détection du début et fin du frontmatter (---) 
-                        if (lineStart && text.substr(i, 3) === '---') {
-                            inFrontmatter = !inFrontmatter;
-                            i += 2; // Sauter les 3 tirets (on incrémentera encore i dans la boucle)
-                            lineStart = false;
-                            continue;
+                    // Détection des nouvelles lignes
+                    if (char === '\n') {
+                        lineStart = true;
+                    } else if (lineStart && char !== ' ' && char !== '\t') {
+                        lineStart = false;
+                    }
+                    
+                    const isInSpecialBlock = inFrontmatter || inCodeBlock;
+                    
+                    // Générer les spans TOUJOURS (sauf dans les blocs spéciaux)
+                    if (!isInSpecialBlock) {
+                        if (char === '\u00A0') {
+                            builder.add(pos, pos + 1, nonBreakingSpaceDecoration);
                         }
-                        
-                        // Détection du début et fin des blocs de code (```)
-                        if (lineStart && text.substr(i, 3) === '```') {
-                            inCodeBlock = !inCodeBlock;
-                            i += 2; // Sauter les 3 backticks
-                            lineStart = false;
-                            continue;
+                        if (char === '\u202F') {
+                            builder.add(pos, pos + 1, thinSpaceDecoration);
                         }
-                        
-                        // Détection du début d'une nouvelle ligne
-                        if (char === '\n') {
-                            lineStart = true;
-                        } else if (lineStart && char !== ' ' && char !== '\t') {
-                            lineStart = false;
+                        if (char === '—') {
+                            builder.add(pos, pos + 1, emDashDecoration);
                         }
-                        
-                        // Vérifier si la ligne actuelle est dans un bloc spécial
-                        const isInSpecialBlock = inFrontmatter || inCodeBlock;
-                        
-                        // Appliquer les décorations seulement si on n'est pas dans un bloc spécial
-                        if (!isInSpecialBlock) {
-                            if (char === '\u00A0') {
-                                builder.add(pos, pos + 1, nonBreakingSpaceDecoration);
-                            }
-                            if (char === '\u202F') {
-                                builder.add(pos, pos + 1, thinSpaceDecoration);
-                            }
-                            if (char === '—') {
-                                builder.add(pos, pos + 1, emDashDecoration);
-                            }
-                            if (char === ' ') {
-                                builder.add(pos, pos + 1, regularSpaceDecoration);
-                            }
+                        if (char === ' ') {
+                            builder.add(pos, pos + 1, regularSpaceDecoration);
                         }
                     }
                 }
@@ -114,8 +98,6 @@ export function createDecorations(settings: MicrotypographieSettings) {
             
             return builder.finish();
         }
-
-        
     }, {
         decorations: v => v.decorations
     });

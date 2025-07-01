@@ -514,3 +514,60 @@
 .typography-tooltip:hover::after {
     opacity: 1;
 }
+
+
+/* Caractères invisibles - cachés par défaut */
+.cm-line .nonBreakingSpace::before,
+.cm-line .thinSpace::after,
+.cm-line .regularSpace::after,
+.cm-line .tab-char::after,
+.cm-line .line-break::after {
+    display: none;
+}
+
+/* Affichage des caractères invisibles quand la classe est active */
+.typography-show-invisible .cm-line .nonBreakingSpace::before {
+    content: '\E0A0';  
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-nonBreakingSpace);
+    font-family: "hidden-characters";
+    pointer-events: none;
+    line-height: 100%;
+    vertical-align: bottom;
+    opacity: var(--space-opacity);
+    display: block;
+}
+
+.typography-show-invisible .cm-line .thinSpace::after {
+    content: '\E209'; 
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-77%, -40%);
+    color: var(--color-thin-space);
+    font-family: "hidden-characters";
+    font-size: var(--space-size);
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    display: block;
+}
+
+.typography-show-invisible .cm-line .regularSpace::after {
+    content: '·';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-regular-space);
+    font-size: var(--space-size);
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
+    line-height: 100%;
+    opacity: var(--space-opacity);
+    display: block;
+}
+
