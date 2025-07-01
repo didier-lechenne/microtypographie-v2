@@ -2,17 +2,14 @@ import { EditorView, Decoration, ViewPlugin, ViewUpdate } from "@codemirror/view
 import { RangeSetBuilder } from "@codemirror/state";
 import { TypographySettings } from '../types/interfaces';
 
-
-
-// Variable globale pour partager les settings
-let globalSettings: TypographySettings;
-let settingsVersion = 0; // Nouvelle variable pour forcer les mises à jour
+// Variable globale simplifiée pour les settings
+let currentSettings: TypographySettings;
 
 /**
  * Crée les décorations visuelles pour les caractères spéciaux
  */
 export function createDecorations(settings: TypographySettings) {
-    globalSettings = settings;
+    currentSettings = settings;
     
     // Décoration pour l'espace insécable normale
     const nonBreakingSpaceDecoration = Decoration.mark({
@@ -36,21 +33,15 @@ export function createDecorations(settings: TypographySettings) {
 
     return ViewPlugin.fromClass(class {
         decorations: any;
-        lastSettingsVersion: number = 0; // Tracker la version des settings
 
         constructor(view: EditorView) {
             this.decorations = this.buildDecorations(view);
-            this.lastSettingsVersion = settingsVersion;
         }
 
         update(update: ViewUpdate) {
-            // Mise à jour si le document change OU si les settings ont changé
-            if (update.docChanged || 
-                update.viewportChanged || 
-                this.lastSettingsVersion !== settingsVersion) {
-                
+            // Mise à jour si le document change OU si la vue change
+            if (update.docChanged || update.viewportChanged) {
                 this.decorations = this.buildDecorations(update.view);
-                this.lastSettingsVersion = settingsVersion;
             }
         }
 
@@ -58,7 +49,7 @@ export function createDecorations(settings: TypographySettings) {
             const builder = new RangeSetBuilder<Decoration>();
             
             // Appliquer les décorations uniquement si la mise en évidence est activée
-            if (globalSettings && globalSettings.highlightEnabled) {
+            if (currentSettings && currentSettings.highlightEnabled) {
                 for (let { from, to } of view.visibleRanges) {
                     let text = view.state.doc.sliceString(from, to);
                     
@@ -127,32 +118,8 @@ export function createDecorations(settings: TypographySettings) {
 }
 
 /**
- * Met à jour les settings globaux et force la mise à jour
- */
-/**
- * Met à jour les settings globaux et force la mise à jour
+ * Met à jour les settings globaux (fonction simplifiée)
  */
 export function updateDecorationSettings(settings: TypographySettings) {
-    globalSettings = settings;
-    settingsVersion++;
-    
-    // Méthode plus agressive : simuler un changement de viewport
-    setTimeout(() => {
-        const editors = document.querySelectorAll('.cm-editor');
-        editors.forEach((editor: any) => {
-            if (editor.cmView && editor.cmView.state) {
-                try {
-                    // Forcer un changement de viewport pour déclencher update()
-                    const view = editor.cmView;
-                    const currentViewport = view.viewport;
-                    
-                    // Déclencher artificiellement un changement de viewport
-                    view.scrollDOM.dispatchEvent(new Event('scroll'));
-                    view.requestMeasure();
-                } catch (error) {
-                    console.log('Erreur lors de la mise à jour:', error);
-                }
-            }
-        });
-    }, 10);
+    currentSettings = settings;
 }

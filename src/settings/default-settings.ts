@@ -97,8 +97,8 @@ export function createSettingsForLocale(locale: string): TypographySettings {
         enableRealTimeCorrection: true,
         locale: locale,
         highlightEnabled: false,
-            highlightButton: true,        // ✅ Ajouté
-    tabTitleBarButton: false,     // ✅ Ajouté
+        highlightButton: true,        
+        tabTitleBarButton: false,     
         fixers: {}
     };
 

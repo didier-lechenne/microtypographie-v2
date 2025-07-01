@@ -1,6 +1,6 @@
 // src/main.ts - Plugin principal modulaire
 import { App, Editor, MarkdownView, Plugin, Notice } from "obsidian";
-import { createDecorations, updateDecorationSettings } from './ui/decorations';
+import { createDecorations } from './ui/decorations';
 import {
   createStatusBarButton,
   updateStatusBarButton,
@@ -55,21 +55,17 @@ async onload(): Promise<void> {
         this.updateInvisibleCharsDisplay();
 
         // Ajouter les boutons
-        if (this.settings.highlightButton) {
-            this.statusBarButton = createStatusBarButton(
-                this,
-                this.settings.highlightEnabled,
-                () => this.toggleHighlight()
-            );
-        }
+        this.statusBarButton = createStatusBarButton(
+            this,
+            this.settings.highlightEnabled,
+            () => this.toggleHighlight()
+        );
 
-        if (this.settings.tabTitleBarButton) {
-            this.tabTitleBarButton = createTabTitleBarButton(
-                this,
-                this.settings.highlightEnabled,
-                () => this.toggleHighlight()
-            );
-        }
+        this.tabTitleBarButton = createTabTitleBarButton(
+            this,
+            this.settings.highlightEnabled,
+            () => this.toggleHighlight()
+        );
 
         // Ajouter les commandes
         this.addCommands();
