@@ -83,11 +83,6 @@ export interface TypographySettings {
     /** Active/désactive l'affichage des caractères invisibles */
     highlightEnabled: boolean;
     
-    /** Affiche le bouton dans la barre d'état */
-    highlightButton: boolean;
-    
-    /** Affiche le bouton dans la barre de titre des onglets */
-    tabTitleBarButton: boolean;
 }
 
 /**

@@ -37,10 +37,10 @@ export class SmartQuotes extends BaseFixer {
         result = result.replace(/"/g, () => {
             if (!inQuote) {
                 inQuote = true;
-                return `${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_SPACE}`;
+                return `${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}`;
             } else {
                 inQuote = false;
-                return `${UNICODE_CHARS.NO_BREAK_SPACE}${UNICODE_CHARS.RAQUO}`;
+                return `${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}`;
             }
         });
         

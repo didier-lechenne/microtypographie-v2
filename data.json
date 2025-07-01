@@ -2,8 +2,6 @@
   "enableRealTimeCorrection": true,
   "locale": "fr_FR",
   "highlightEnabled": true,
-  "highlightButton": true,
-  "tabTitleBarButton": true,
   "fixers": {
     "Ellipsis": true,
     "Dash": true,

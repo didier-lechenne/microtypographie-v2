@@ -93,10 +93,10 @@ export class FrenchNoBreakSpace extends BaseFixer {
     /**
      * Fournit un exemple de transformation
      */
-    public getExample(): FixerExample {
-        return {
-            before: 'Bonjour ! Comment allez-vous ? Très bien ; merci.',
-            after: `Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}! Comment allez-vous${UNICODE_CHARS.NO_BREAK_THIN_SPACE}? Très bien${UNICODE_CHARS.NO_BREAK_THIN_SPACE}; merci.`
-        };
-    }
+public getExample(): FixerExample {
+    return {
+        before: 'Il a dit "Bonjour" et c\'est parti.',
+        after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et c${UNICODE_CHARS.RSQUO}est parti.`
+    };
+}
 }

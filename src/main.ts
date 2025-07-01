@@ -1,6 +1,6 @@
 // src/main.ts - Plugin principal modulaire
 import { App, Editor, MarkdownView, Plugin, Notice } from "obsidian";
-import { createDecorations } from './ui/decorations';
+import { createDecorations, updateDecorationSettings } from './ui/decorations';
 import {
   createStatusBarButton,
   updateStatusBarButton,
@@ -30,7 +30,6 @@ export default class TypographyPlugin extends Plugin {
   // Ces propriétés sont initialisées dans onload() avant toute utilisation
   settings!: TypographySettings;
   engine!: TypographyEngine;
-  decorationExtension: any;
   statusBarButton: HTMLElement | null = null;
   tabTitleBarButton: HTMLElement | null = null;
 
@@ -116,7 +115,7 @@ async saveSettings(): Promise<void> {
         this.engine.updateSettings(this.settings);
     }
     
-    // Mettre à jour l'affichage CSS (plus besoin d'updateDecorationSettings)
+    // Mettre à jour l'affichage CSS
     this.updateInvisibleCharsDisplay();
 }
   /**
@@ -290,7 +289,7 @@ private updateInvisibleCharsDisplay(): void {
 private async toggleHighlight(): Promise<void> {
     this.settings.highlightEnabled = !this.settings.highlightEnabled;
     
-    // Mise à jour immédiate via CSS
+    // Mise à jour immédiate de l'affichage
     this.updateInvisibleCharsDisplay();
     
     await this.saveSettings();

@@ -222,33 +222,7 @@ export class TypographySettingTab extends PluginSettingTab {
         return recommendedFixers ? recommendedFixers.includes(fixerId) : false;
     }
 
-    /**
-     * Affiche une modal de test des corrections
-     */
-    private showTestModal(): void {
-        const testText = `Voici un test... avec des "guillemets", des espaces avant ! Et des tirets -- pour voir. I'm testing (c) 2025.`;
-        const corrected = this.plugin.engine.processText(testText);
-        
-        const modal = new (window as any).Modal(this.app);
-        modal.setTitle('Test des corrections');
-        
-        const content = modal.contentEl;
-        
-        content.createEl('h4', { text: 'Texte original :' });
-        content.createEl('pre', { text: testText, cls: 'typography-test-original' });
-        
-        content.createEl('h4', { text: 'Texte corrigé :' });
-        content.createEl('pre', { text: corrected, cls: 'typography-test-corrected' });
-        
-        if (testText === corrected) {
-            content.createEl('p', { 
-                text: '⚠️ Aucune correction appliquée. Vérifiez que les fixers sont activés.',
-                cls: 'typography-no-changes'
-            });
-        }
-        
-        modal.open();
-    }
+
 
     /**
      * Ajoute les styles CSS personnalisés
