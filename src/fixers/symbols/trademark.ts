@@ -8,7 +8,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Convertit (c), (r), (tm) en symboles Unicode ©, ®, ™
  * Inspiré du fixer "Trademark" de JoliTypo
  */
-export class TrademarkFixer extends BaseFixer {
+export class Trademark extends BaseFixer {
     public readonly id = 'Trademark';
     public readonly name = 'Symboles de marques';
     public readonly description = 'Convertit (c) → ©, (r) → ®, (tm) → ™';

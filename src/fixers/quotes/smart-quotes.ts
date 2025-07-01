@@ -8,7 +8,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Convertit les guillemets droits en guillemets typographiques
  * Adapte le style selon la langue (français = « », anglais = " ")
  */
-export class SmartQuotesFixer extends BaseFixer {
+export class SmartQuotes extends BaseFixer {
     public readonly id = 'SmartQuotes';
     public readonly name = 'Guillemets intelligents';
     public readonly description = 'Convertit les guillemets droits en guillemets typographiques';

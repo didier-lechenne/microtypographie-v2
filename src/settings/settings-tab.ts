@@ -39,6 +39,8 @@ export class TypographySettingTab extends PluginSettingTab {
 
         // Ajouter les styles CSS personnalisés
         this.addCustomStyles(containerEl);
+
+        this.createHighlightSettings(containerEl);
     }
 
     /**
@@ -335,4 +337,58 @@ export class TypographySettingTab extends PluginSettingTab {
             `;
         }
     }
+
+    /**
+     * Crée les paramètres de mise en évidence
+     * @param containerEl Conteneur parent
+     */
+    private createHighlightSettings(containerEl: HTMLElement): void {
+        const desEl = containerEl.createEl("p", {
+        text: "Affichage des caractères invisibles",
+        });
+        desEl.style.fontWeight = "bold";
+        desEl.style.marginTop = "3em";
+
+        new Setting(containerEl)
+        .setName("Activer l'affichage des caractères invisibles")
+        .addToggle((toggle) =>
+            toggle
+            .setValue(this.plugin.settings.highlightEnabled)
+            .onChange(async (value) => {
+                this.plugin.settings.highlightEnabled = value;
+                await this.plugin.saveSettings();
+            })
+        );
+
+        new Setting(containerEl)
+        .setName("Bouton dans la barre d'état")
+        .setDesc(
+            "Afficher un bouton d'activation/désactivation"
+        )
+        .addToggle((toggle) =>
+            toggle
+            .setValue(this.plugin.settings.highlightButton)
+            .onChange(async (value) => {
+                this.plugin.settings.highlightButton = value;
+                await this.plugin.saveSettings();
+            })
+        );
+
+        new Setting(containerEl)
+        .setName("Bouton dans la barre de titre")
+        .setDesc(
+            "Afficher un bouton d'activation/désactivation dans la barre de titre des onglets"
+        )
+        .addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.settings.tabTitleBarButton)
+                .onChange(async (value) => {
+                    this.plugin.settings.tabTitleBarButton = value;
+                    await this.plugin.saveSettings();
+                })
+        );
+
+
+    }
+
 }

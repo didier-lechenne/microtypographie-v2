@@ -10,7 +10,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Basé sur le fixer CurlyQuote de JoliTypo
  * @see https://github.com/jolicode/JoliTypo/blob/main/src/JoliTypo/Fixer/CurlyQuote.php
  */
-export class CurlyQuoteFixer extends BaseFixer {
+export class CurlyQuote extends BaseFixer {
     public readonly id = 'CurlyQuote';
     public readonly name = 'Apostrophes courbes';
     public readonly description = 'Convertit les apostrophes droites \' en apostrophes typographiques \'';

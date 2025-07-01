@@ -8,7 +8,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Implémentation basique - les vraies règles de césure sont très complexes
  * Désactivé par défaut car nécessite un dictionnaire de césure complet
  */
-export class HyphenFixer extends BaseFixer {
+export class Hyphen extends BaseFixer {
     public readonly id = 'Hyphen';
     public readonly name = 'Césures typographiques';
     public readonly description = 'Améliore les tirets et césures (fonctionnalité basique)';

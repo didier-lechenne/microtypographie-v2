@@ -8,7 +8,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Ajoute des espaces insécables entre les nombres et leurs unités
  * Inspiré du fixer "Unit" de JoliTypo
  */
-export class UnitFixer extends BaseFixer {
+export class Unit extends BaseFixer {
     public readonly id = 'unit';
     public readonly name = 'Espaces avant unités';
     public readonly description = 'Ajoute des espaces insécables entre nombres et unités (12 h, 50 €, 25 %)';

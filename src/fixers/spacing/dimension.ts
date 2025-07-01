@@ -8,7 +8,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Convertit les signes de multiplication textuels en symbole × Unicode
  * Inspiré du fixer "Dimension" de JoliTypo
  */
-export class DimensionFixer extends BaseFixer {
+export class Dimension extends BaseFixer {
     public readonly id = 'Dimension';
     public readonly name = 'Symboles de multiplication';
     public readonly description = 'Convertit x et * entre nombres en symbole × (12 x 34 → 12×34)';

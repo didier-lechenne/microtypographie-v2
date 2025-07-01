@@ -6,32 +6,32 @@ export { BaseFixer } from './base/base-fixer';
 // Export des fixers de ponctuation
 export { Ellipsis } from './punctuation/ellipsis';
 export { Dash } from './punctuation/dash';
-export { HyphenFixer } from './punctuation/hyphen';
+export { Hyphen } from './punctuation/hyphen';
 
 // Export des fixers d'espacement
 export { FrenchNoBreakSpace } from './spacing/french-spacing';
 export { NoSpaceBeforeComma } from './spacing/comma';
-export { UnitFixer } from './spacing/unit';
-export { DimensionFixer } from './spacing/dimension';
+export { Unit } from './spacing/unit';
+export { Dimension } from './spacing/dimension';
 
 // Export des fixers de guillemets
-export { SmartQuotesFixer } from './quotes/smart-quotes';
-export { CurlyQuoteFixer } from './quotes/curly-quote';
+export { SmartQuotes } from './quotes/smart-quotes';
+export { CurlyQuote } from './quotes/curly-quote';
 
 // Export des fixers de symboles
-export { TrademarkFixer } from './symbols/trademark';
+export { Trademark } from './symbols/trademark';
 
 // Import pour l'usage interne
 import { Ellipsis } from './punctuation/ellipsis';
 import { Dash } from './punctuation/dash';
-import { HyphenFixer } from './punctuation/hyphen';
 import { FrenchNoBreakSpace } from './spacing/french-spacing';
+import { SmartQuotes } from './quotes/smart-quotes';
+import { CurlyQuote } from './quotes/curly-quote';
 import { NoSpaceBeforeComma } from './spacing/comma';
-import { UnitFixer } from './spacing/unit';
-import { DimensionFixer } from './spacing/dimension';
-import { SmartQuotesFixer } from './quotes/smart-quotes';
-import { CurlyQuoteFixer } from './quotes/curly-quote';
-import { TrademarkFixer } from './symbols/trademark';
+import { Unit } from './spacing/unit';
+import { Dimension } from './spacing/dimension';
+import { Trademark } from './symbols/trademark';
+import { Hyphen } from './punctuation/hyphen';
 
 import { TypographicFixer } from '../types/interfaces';
 
@@ -45,13 +45,13 @@ export function createAllFixers(): TypographicFixer[] {
         new Ellipsis(),           // priorité 1
         new Dash(),               // priorité 2
         new FrenchNoBreakSpace(), // priorité 3
-        new SmartQuotesFixer(),   // priorité 4
-        new CurlyQuoteFixer(),    // priorité 5
+        new SmartQuotes(),   // priorité 4
+        new CurlyQuote(),    // priorité 5
         new NoSpaceBeforeComma(), // priorité 6
-        new UnitFixer(),          // priorité 7
-        new DimensionFixer(),     // priorité 8
-        new TrademarkFixer(),     // priorité 9
-        new HyphenFixer(),        // priorité 10 (désactivé par défaut)
+        new Unit(),          // priorité 7
+        new Dimension(),     // priorité 8
+        new Trademark(),     // priorité 9
+        new Hyphen(),        // priorité 10 (désactivé par défaut)
     ];
 }
 
@@ -66,7 +66,7 @@ export const FixerFactories = {
         return [
             new Ellipsis(),
             new Dash(),
-            new HyphenFixer(),
+            new Hyphen(),
         ];
     },
 
@@ -77,8 +77,8 @@ export const FixerFactories = {
         return [
             new FrenchNoBreakSpace(),
             new NoSpaceBeforeComma(),
-            new UnitFixer(),
-            new DimensionFixer(),
+            new Unit(),
+            new Dimension(),
         ];
     },
 
@@ -87,8 +87,8 @@ export const FixerFactories = {
      */
     createQuoteFixers(): TypographicFixer[] {
         return [
-            new SmartQuotesFixer(),
-            new CurlyQuoteFixer(),
+            new SmartQuotes(),
+            new CurlyQuote(),
         ];
     },
 
@@ -97,7 +97,7 @@ export const FixerFactories = {
      */
     createSymbolFixers(): TypographicFixer[] {
         return [
-            new TrademarkFixer(),
+            new Trademark(),
         ];
     },
 
@@ -110,11 +110,11 @@ export const FixerFactories = {
             new Ellipsis(),
             new Dash(),
             new FrenchNoBreakSpace(),
-            new SmartQuotesFixer(),
-            new CurlyQuoteFixer(),
-            new UnitFixer(),
-            new DimensionFixer(),
-            new TrademarkFixer(),
+            new SmartQuotes(),
+            new CurlyQuote(),
+            new Unit(),
+            new Dimension(),
+            new Trademark(),
             new NoSpaceBeforeComma(),
             // Note: Hyphen désactivé par défaut car complexe
         ];
@@ -128,11 +128,11 @@ export const FixerFactories = {
         return [
             new Ellipsis(),
             new Dash(),
-            new SmartQuotesFixer(),
-            new CurlyQuoteFixer(),
-            new UnitFixer(),
-            new DimensionFixer(),
-            new TrademarkFixer(),
+            new SmartQuotes(),
+            new CurlyQuote(),
+            new Unit(),
+            new Dimension(),
+            new Trademark(),
             new NoSpaceBeforeComma(),
             // Note: Hyphen désactivé par défaut
         ];
