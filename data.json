@@ -7,10 +7,5 @@
     "french-spacing": true,
     "no-space-comma": true,
     "smart-quotes": false
-  },
-  "stats": {
-    "totalCorrections": 0,
-    "correctionsByFixer": {},
-    "lastUsed": 1751306708857
   }
 }

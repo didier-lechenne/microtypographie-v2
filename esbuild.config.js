@@ -17,7 +17,7 @@ async function startBuild() {
     banner: {
       js: banner,
     },
-    entryPoints: ['main.ts'], // Point d'entrée modifié
+    entryPoints: ['src/main.ts'], // Point d'entrée modifié
     bundle: true,
     external: [
       'obsidian',
