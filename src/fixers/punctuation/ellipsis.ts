@@ -8,7 +8,7 @@ import { UNICODE_CHARS, UNICODE_PATTERNS } from '../../constants/unicode';
  * Fixer pour les points de suspension
  * Convertit ... en … (caractère Unicode unique)
  */
-export class EllipsisFixer extends BaseFixer {
+export class Ellipsis extends BaseFixer {
     public readonly id = 'ellipsis';
     public readonly name = 'Points de suspension';
     public readonly description = 'Remplace ... par le caractère ellipse Unicode (…)';

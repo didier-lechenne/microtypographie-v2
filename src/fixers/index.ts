@@ -4,12 +4,12 @@
 export { BaseFixer } from './base/base-fixer';
 
 // Export des fixers de ponctuation
-export { EllipsisFixer } from './punctuation/ellipsis';
-export { DashFixer } from './punctuation/dash';
+export { Ellipsis } from './punctuation/ellipsis';
+export { Dash } from './punctuation/dash';
 
 // Export des fixers d'espacement
-export { FrenchSpacingFixer } from './spacing/french-spacing';
-export { CommaFixer } from './spacing/comma';
+export { FrenchNoBreakSpace } from './spacing/french-spacing';
+export { NoSpaceBeforeComma } from './spacing/comma';
 
 // Export des fixers de guillemets
 export { SmartQuotesFixer } from './quotes/smart-quotes';
@@ -17,10 +17,10 @@ export { SmartQuotesFixer } from './quotes/smart-quotes';
 
 
 // Import pour l'usage interne
-import { EllipsisFixer } from './punctuation/ellipsis';
-import { DashFixer } from './punctuation/dash';
-import { FrenchSpacingFixer } from './spacing/french-spacing';
-import { CommaFixer } from './spacing/comma';
+import { Ellipsis } from './punctuation/ellipsis';
+import { Dash } from './punctuation/dash';
+import { FrenchNoBreakSpace } from './spacing/french-spacing';
+import { NoSpaceBeforeComma } from './spacing/comma';
 import { SmartQuotesFixer } from './quotes/smart-quotes';
 
 
@@ -32,10 +32,10 @@ import { TypographicFixer } from '../types/interfaces';
  */
 export function createAllFixers(): TypographicFixer[] {
     return [
-        new EllipsisFixer(),
-        new DashFixer(),
-        new FrenchSpacingFixer(),
-        new CommaFixer(),
+        new Ellipsis(),
+        new Dash(),
+        new FrenchNoBreakSpace(),
+        new NoSpaceBeforeComma(),
         new SmartQuotesFixer(),
     ];
 }
@@ -49,8 +49,8 @@ export const FixerFactories = {
      */
     createPunctuationFixers(): TypographicFixer[] {
         return [
-            new EllipsisFixer(),
-            new DashFixer(),
+            new Ellipsis(),
+            new Dash(),
         ];
     },
 
@@ -59,8 +59,8 @@ export const FixerFactories = {
      */
     createSpacingFixers(): TypographicFixer[] {
         return [
-            new FrenchSpacingFixer(),
-            new CommaFixer(),
+            new FrenchNoBreakSpace(),
+            new NoSpaceBeforeComma(),
         ];
     },
 
@@ -80,11 +80,11 @@ export const FixerFactories = {
      */
     createFrenchEssentialFixers(): TypographicFixer[] {
         return [
-            new EllipsisFixer(),
-            new DashFixer(),
-            new FrenchSpacingFixer(),
+            new Ellipsis(),
+            new Dash(),
+            new FrenchNoBreakSpace(),
             new SmartQuotesFixer(),
-            new CommaFixer(),
+            new NoSpaceBeforeComma(),
         ];
     },
 
@@ -93,10 +93,10 @@ export const FixerFactories = {
      */
     createEnglishEssentialFixers(): TypographicFixer[] {
         return [
-            new EllipsisFixer(),
-            new DashFixer(),
+            new Ellipsis(),
+            new Dash(),
             new SmartQuotesFixer(),
-            new CommaFixer(),
+            new NoSpaceBeforeComma(),
         ];
     }
 };

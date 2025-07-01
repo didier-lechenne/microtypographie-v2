@@ -8,7 +8,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Fixer pour l'espacement à la française
  * Applique les règles d'espacement selon la typographie française
  */
-export class FrenchSpacingFixer extends BaseFixer {
+export class FrenchNoBreakSpace extends BaseFixer {
     public readonly id = 'french-spacing';
     public readonly name = 'Espaces français';
     public readonly description = 'Ajoute des espaces insécables selon les règles françaises';

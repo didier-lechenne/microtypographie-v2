@@ -9,7 +9,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Convertit -- en — (tiret cadratin)
  * Convertit les tirets entre nombres en – (tiret demi-cadratin)
  */
-export class DashFixer extends BaseFixer {
+export class Dash extends BaseFixer {
     public readonly id = 'dash';
     public readonly name = 'Tirets typographiques';
     public readonly description = 'Convertit -- en — et améliore les tirets entre nombres';
