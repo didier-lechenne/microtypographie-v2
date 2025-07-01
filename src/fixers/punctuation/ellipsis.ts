@@ -9,7 +9,7 @@ import { UNICODE_CHARS, UNICODE_PATTERNS } from '../../constants/unicode';
  * Convertit ... en … (caractère Unicode unique)
  */
 export class Ellipsis extends BaseFixer {
-    public readonly id = 'ellipsis';
+    public readonly id = 'Ellipsis';
     public readonly name = 'Points de suspension';
     public readonly description = 'Remplace ... par le caractère ellipse Unicode (…)';
     public readonly category = 'punctuation' as const;

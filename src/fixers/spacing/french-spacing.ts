@@ -9,7 +9,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Applique les règles d'espacement selon la typographie française
  */
 export class FrenchNoBreakSpace extends BaseFixer {
-    public readonly id = 'french-spacing';
+    public readonly id = 'FrenchNoBreakSpace';
     public readonly name = 'Espaces français';
     public readonly description = 'Ajoute des espaces insécables selon les règles françaises';
     public readonly category = 'spacing' as const;

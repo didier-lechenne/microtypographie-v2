@@ -9,7 +9,7 @@ import { UNICODE_CHARS } from '../../constants/unicode';
  * Adapte le style selon la langue (français = « », anglais = " ")
  */
 export class SmartQuotesFixer extends BaseFixer {
-    public readonly id = 'smart-quotes';
+    public readonly id = 'SmartQuotes';
     public readonly name = 'Guillemets intelligents';
     public readonly description = 'Convertit les guillemets droits en guillemets typographiques';
     public readonly category = 'quotes' as const;
