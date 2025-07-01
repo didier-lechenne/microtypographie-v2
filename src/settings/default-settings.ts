@@ -19,8 +19,6 @@ export const DEFAULT_SETTINGS: TypographySettings = {
         // Guillemets - Adaptatifs selon la langue
         'smart-quotes': true,    // Guillemets français « » ou anglais " "
         
-        // Symboles - Moins prioritaire, désactivé par défaut
-        'math-symbols': false,   // Symboles mathématiques et de marque
     },
     
 
@@ -38,7 +36,6 @@ export const ENGLISH_SETTINGS: TypographySettings = {
         'french-spacing': false,  // Désactivé pour l'anglais
         'no-space-comma': true,
         'smart-quotes': true,
-        'math-symbols': false,
     }
 };
 
@@ -54,7 +51,6 @@ export const MINIMAL_SETTINGS: TypographySettings = {
         'french-spacing': false,
         'no-space-comma': true,
         'smart-quotes': false,
-        'math-symbols': false,
     }
 };
 

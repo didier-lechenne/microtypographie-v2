@@ -14,8 +14,7 @@ export { CommaFixer } from './spacing/comma';
 // Export des fixers de guillemets
 export { SmartQuotesFixer } from './quotes/smart-quotes';
 
-// Export des fixers de symboles
-export { MathSymbolsFixer } from './symbols/math-symbols';
+
 
 // Import pour l'usage interne
 import { EllipsisFixer } from './punctuation/ellipsis';
@@ -23,7 +22,7 @@ import { DashFixer } from './punctuation/dash';
 import { FrenchSpacingFixer } from './spacing/french-spacing';
 import { CommaFixer } from './spacing/comma';
 import { SmartQuotesFixer } from './quotes/smart-quotes';
-import { MathSymbolsFixer } from './symbols/math-symbols';
+
 
 import { TypographicFixer } from '../types/interfaces';
 
@@ -38,7 +37,6 @@ export function createAllFixers(): TypographicFixer[] {
         new FrenchSpacingFixer(),
         new CommaFixer(),
         new SmartQuotesFixer(),
-        new MathSymbolsFixer(),
     ];
 }
 
@@ -75,14 +73,7 @@ export const FixerFactories = {
         ];
     },
 
-    /**
-     * Crée tous les fixers de symboles
-     */
-    createSymbolFixers(): TypographicFixer[] {
-        return [
-            new MathSymbolsFixer(),
-        ];
-    },
+
 
     /**
      * Crée les fixers essentiels pour le français
@@ -133,8 +124,7 @@ export const FixerMetadata = {
             'dash', 
             'french-spacing',
             'no-space-comma',
-            'smart-quotes',
-            'math-symbols'
+            'smart-quotes'
         ];
     }
 };

@@ -257,28 +257,7 @@ class SmartQuotesFixer implements TypographicFixer {
     }
 }
 
-class MathSymbolsFixer implements TypographicFixer {
-    id = 'math-symbols';
-    name = 'Symboles mathématiques';
-    description = 'Convertit x entre nombres en × et améliore d\'autres symboles';
-    enabled = true;
-    priority = 5;
-    category: 'symbols' = 'symbols';
 
-    fix(text: string): string {
-        return text
-            // x entre nombres devient ×
-            .replace(/(\d+)\s*x\s*(\d+)/gi, `$1${UNICODE_CHARS.TIMES}$2`)
-            // Symboles de marque
-            .replace(/\(tm\)/gi, UNICODE_CHARS.TRADE)
-            .replace(/\(r\)/gi, UNICODE_CHARS.REG)
-            .replace(/\(c\)/gi, UNICODE_CHARS.COPY);
-    }
-
-    getExample() {
-        return { before: 'Matrice 3 x 4 (c) 2024', after: `Matrice 3${UNICODE_CHARS.TIMES}4 ${UNICODE_CHARS.COPY} 2024` };
-    }
-}
 
 class NoSpaceBeforeCommaFixer implements TypographicFixer {
     id = 'no-space-comma';
@@ -318,7 +297,6 @@ class TypographyEngine {
             new DashFixer(),
             new FrenchSpacingFixer(),
             new SmartQuotesFixer(),
-            new MathSymbolsFixer(),
             new NoSpaceBeforeCommaFixer()
         ];
 
@@ -387,7 +365,6 @@ const DEFAULT_SETTINGS: TypographySettings = {
         'dash': true,
         'french-spacing': true,  // Règle principale pour le français
         'smart-quotes': true,
-        'math-symbols': false,   // Moins prioritaire pour commencer
         'no-space-comma': true
     }
 }

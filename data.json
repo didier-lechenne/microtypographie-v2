@@ -6,8 +6,7 @@
     "dash": true,
     "french-spacing": true,
     "no-space-comma": true,
-    "smart-quotes": false,
-    "math-symbols": false
+    "smart-quotes": false
   },
   "stats": {
     "totalCorrections": 0,
