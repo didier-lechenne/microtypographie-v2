@@ -1,6 +1,6 @@
 {
   "name": "microtypographie-v2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Plugin Obsidian pour la correction typographique automatique",
   "main": "main.js",
   "scripts": {
