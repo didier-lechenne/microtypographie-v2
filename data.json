@@ -2,7 +2,8 @@
   "enableRealTimeCorrection": true,
   "locale": "fr_FR",
   "highlightEnabled": true,
-
+  "highlightButton": false,
+  "tabTitleBarButton": false,
   "fixers": {
     "Ellipsis": true,
     "Dash": true,
@@ -13,6 +14,6 @@
     "Unit": true,
     "Dimension": true,
     "Hyphen": true,
-    "Trademark": true
+    "Trademark": false
   }
 }

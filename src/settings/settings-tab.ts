@@ -1,236 +1,254 @@
 // src/settings/settings-tab.ts
-import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
-import { TypographicFixer } from '../types/interfaces';
-import { LOCALE_CONFIGURATIONS, LOCALE_NAMES, CATEGORY_NAMES } from './default-settings';
-import TypographyPlugin from '../main';
+import { App, PluginSettingTab, Setting, Notice } from "obsidian";
+import { TypographicFixer } from "../types/interfaces";
+import {
+  LOCALE_CONFIGURATIONS,
+  LOCALE_NAMES,
+  CATEGORY_NAMES,
+} from "./default-settings";
+import TypographyPlugin from "../main";
 
 /**
  * Interface de configuration du plugin Typography Fixers
  */
 export class TypographySettingTab extends PluginSettingTab {
-    plugin: TypographyPlugin;
+  plugin: TypographyPlugin;
 
-    constructor(app: App, plugin: TypographyPlugin) {
-        super(app, plugin);
-        this.plugin = plugin;
-    }
+  constructor(app: App, plugin: TypographyPlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
 
-    display(): void {
-        const { containerEl } = this;
-        containerEl.empty();
+  display(): void {
+    const { containerEl } = this;
+    containerEl.empty();
 
-        // Titre principal
-        containerEl.createEl('h2', { text: 'Paramètres Typography Fixers' });
+    // Titre principal
+    containerEl.createEl("h2", { text: "Paramètres Typography Fixers" });
 
-        // Description
-        containerEl.createEl('p', { 
-            text: 'Plugin de correction typographique basé sur JoliTypo. Corrige automatiquement les erreurs typographiques selon les règles françaises, anglaises et allemandes.',
-            cls: 'setting-item-description'
+    // Description
+    containerEl.createEl("p", {
+      text: "Plugin de correction typographique basé sur JoliTypo. Corrige automatiquement les erreurs typographiques selon les règles françaises, anglaises et allemandes.",
+      cls: "setting-item-description",
+    });
+
+    // Section: Configuration générale
+    this.createGeneralSettings(containerEl);
+
+    // Section: Règles de correction
+    this.createFixerSettings(containerEl);
+
+    // Section: Actions
+    this.createActionsSection(containerEl);
+
+    // Ajouter les styles CSS personnalisés
+    this.addCustomStyles(containerEl);
+
+    this.createHighlightSettings(containerEl);
+  }
+
+  /**
+   * Crée la section de configuration générale
+   */
+  private createGeneralSettings(containerEl: HTMLElement): void {
+    containerEl.createEl("h3", { text: "Configuration générale" });
+
+    // Correction en temps réel
+    new Setting(containerEl)
+      .setName("Correction en temps réel")
+      .setDesc("Active la correction automatique pendant la frappe")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.enableRealTimeCorrection)
+          .onChange(async (value) => {
+            this.plugin.settings.enableRealTimeCorrection = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    // Langue typographique
+    new Setting(containerEl)
+      .setName("Langue typographique")
+      .setDesc(
+        "Choisissez les règles typographiques à appliquer. Change automatiquement les fixers recommandés."
+      )
+      .addDropdown((dropdown) => {
+        // Ajouter toutes les locales disponibles
+        Object.entries(LOCALE_NAMES).forEach(([locale, name]) => {
+          dropdown.addOption(locale, name);
         });
 
-        // Section: Configuration générale
-        this.createGeneralSettings(containerEl);
+        return dropdown
+          .setValue(this.plugin.settings.locale)
+          .onChange(async (value) => {
+            this.plugin.settings.locale = value;
+            this.updateFixersForLocale(value);
+            await this.plugin.saveSettings();
+            // Note: this.display() sera appelé dans updateFixersForLocale()
+          });
+      });
 
-        // Section: Règles de correction
-        this.createFixerSettings(containerEl);
+    // Information sur les fixers actifs
+    const activeFixersCount = Object.values(this.plugin.settings.fixers).filter(
+      Boolean
+    ).length;
+    const totalFixersCount = Object.keys(this.plugin.settings.fixers).length;
 
-        // Section: Actions
-        this.createActionsSection(containerEl);
+    containerEl.createEl("p", {
+      text: `${activeFixersCount}/${totalFixersCount} règles activées pour ${
+        LOCALE_NAMES[this.plugin.settings.locale]
+      }`,
+      cls: "setting-item-description",
+    });
+  }
 
-        // Ajouter les styles CSS personnalisés
-        this.addCustomStyles(containerEl);
+  /**
+   * Crée la section des fixers par catégorie
+   */
+  private createFixerSettings(containerEl: HTMLElement): void {
+    containerEl.createEl("h3", { text: "Règles de correction" });
+    containerEl.createEl("p", {
+      text: "Activez ou désactivez les règles typographiques selon vos besoins. Les règles recommandées pour votre langue sont activées automatiquement.",
+      cls: "setting-item-description",
+    });
 
-        this.createHighlightSettings(containerEl);
-    }
+    // Grouper les fixers par catégorie
+    const fixersByCategory = this.plugin.engine
+      .getFixers()
+      .reduce((acc, fixer) => {
+        if (!acc[fixer.category]) acc[fixer.category] = [];
+        acc[fixer.category].push(fixer);
+        return acc;
+      }, {} as Record<string, TypographicFixer[]>);
 
-    /**
-     * Crée la section de configuration générale
-     */
-    private createGeneralSettings(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Configuration générale' });
+    // Créer les paramètres pour chaque catégorie
+    Object.entries(fixersByCategory).forEach(([category, fixers]) => {
+      // Titre de catégorie avec contrôle global
+      const categoryHeader = containerEl.createEl("h4", {
+        text: CATEGORY_NAMES[category] || category,
+        cls: "typography-category-header",
+      });
 
-        // Correction en temps réel
-        new Setting(containerEl)
-            .setName('Correction en temps réel')
-            .setDesc('Active la correction automatique pendant la frappe')
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableRealTimeCorrection)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableRealTimeCorrection = value;
-                    await this.plugin.saveSettings();
-                })
-            );
+      // Bouton pour activer/désactiver toute la catégorie
+      const toggleAllButton = categoryHeader.createEl("button", {
+        text: "Tout basculer",
+        cls: "typography-toggle-category",
+      });
 
-        // Langue typographique
-        new Setting(containerEl)
-            .setName('Langue typographique')
-            .setDesc('Choisissez les règles typographiques à appliquer. Change automatiquement les fixers recommandés.')
-            .addDropdown(dropdown => {
-                // Ajouter toutes les locales disponibles
-                Object.entries(LOCALE_NAMES).forEach(([locale, name]) => {
-                    dropdown.addOption(locale, name);
-                });
-                
-                return dropdown
-                    .setValue(this.plugin.settings.locale)
-                    .onChange(async (value) => {
-                        this.plugin.settings.locale = value;
-                        this.updateFixersForLocale(value);
-                        await this.plugin.saveSettings();
-                        // Note: this.display() sera appelé dans updateFixersForLocale()
-                    });
-            });
+      toggleAllButton.addEventListener("click", async () => {
+        const allEnabled = fixers.every((f) => f.enabled);
+        const newState = !allEnabled;
 
-        // Information sur les fixers actifs
-        const activeFixersCount = Object.values(this.plugin.settings.fixers).filter(Boolean).length;
-        const totalFixersCount = Object.keys(this.plugin.settings.fixers).length;
-        
-        containerEl.createEl('p', {
-            text: `${activeFixersCount}/${totalFixersCount} règles activées pour ${LOCALE_NAMES[this.plugin.settings.locale]}`,
-            cls: 'setting-item-description'
-        });
-    }
-
-    /**
-     * Crée la section des fixers par catégorie
-     */
-    private createFixerSettings(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Règles de correction' });
-        containerEl.createEl('p', { 
-            text: 'Activez ou désactivez les règles typographiques selon vos besoins. Les règles recommandées pour votre langue sont activées automatiquement.',
-            cls: 'setting-item-description'
+        fixers.forEach((fixer) => {
+          this.plugin.settings.fixers[fixer.id] = newState;
         });
 
-        // Grouper les fixers par catégorie
-        const fixersByCategory = this.plugin.engine.getFixers().reduce((acc, fixer) => {
-            if (!acc[fixer.category]) acc[fixer.category] = [];
-            acc[fixer.category].push(fixer);
-            return acc;
-        }, {} as Record<string, TypographicFixer[]>);
+        await this.plugin.saveSettings();
+        this.display();
+      });
 
-        // Créer les paramètres pour chaque catégorie
-        Object.entries(fixersByCategory).forEach(([category, fixers]) => {
-            // Titre de catégorie avec contrôle global
-            const categoryHeader = containerEl.createEl('h4', { 
-                text: CATEGORY_NAMES[category] || category,
-                cls: 'typography-category-header'
-            });
+      // Paramètres individuels des fixers
+      fixers.forEach((fixer) => {
+        const setting = new Setting(containerEl)
+          .setName(fixer.name)
+          .setDesc(fixer.description)
+          .addToggle((toggle) =>
+            toggle.setValue(fixer.enabled).onChange(async (value) => {
+              this.plugin.settings.fixers[fixer.id] = value;
+              await this.plugin.saveSettings();
+            })
+          );
 
-            // Bouton pour activer/désactiver toute la catégorie
-            const toggleAllButton = categoryHeader.createEl('button', {
-                text: 'Tout basculer',
-                cls: 'typography-toggle-category'
-            });
-
-            toggleAllButton.addEventListener('click', async () => {
-                const allEnabled = fixers.every(f => f.enabled);
-                const newState = !allEnabled;
-                
-                fixers.forEach(fixer => {
-                    this.plugin.settings.fixers[fixer.id] = newState;
-                });
-                
-                await this.plugin.saveSettings();
-                this.display();
-            });
-
-            // Paramètres individuels des fixers
-            fixers.forEach(fixer => {
-                const setting = new Setting(containerEl)
-                    .setName(fixer.name)
-                    .setDesc(fixer.description)
-                    .addToggle(toggle => toggle
-                        .setValue(fixer.enabled)
-                        .onChange(async (value) => {
-                            this.plugin.settings.fixers[fixer.id] = value;
-                            await this.plugin.saveSettings();
-                        })
-                    );
-
-                // Ajouter un badge si c'est recommandé pour la locale actuelle
-                const isRecommended = this.isFixerRecommendedForCurrentLocale(fixer.id);
-                if (isRecommended) {
-                    const badge = setting.nameEl.createEl('span', {
-                        text: 'Recommandé',
-                        cls: 'typography-recommended-badge'
-                    });
-                }
-
-                // Ajouter un exemple si disponible
-                if (fixer.getExample) {
-                    const example = fixer.getExample();
-                    const exampleEl = setting.descEl.createDiv({ cls: 'typography-example' });
-                    
-                    exampleEl.createDiv({ cls: 'typography-example-before' })
-                        .innerHTML = `<span class="typography-example-label">Avant :</span> <code>${example.before}</code>`;
-                    
-                    exampleEl.createDiv({ cls: 'typography-example-after' })
-                        .innerHTML = `<span class="typography-example-label">Après :</span> <code>${example.after}</code>`;
-                }
-            });
-        });
-    }
-
-    /**
-     * Crée la section des actions
-     */
-    private createActionsSection(containerEl: HTMLElement): void {
-        containerEl.createEl('h3', { text: 'Actions' });
-
-        
-        // Section: Actions (simplifiée)
-        new Setting(containerEl)
-            .setName('Restaurer la configuration recommandée')
-            .setDesc(`Active les fixers recommandés pour ${LOCALE_NAMES[this.plugin.settings.locale]}`)
-            .addButton(button => button
-                .setButtonText('Restaurer')
-                .onClick(async () => {
-                    this.updateFixersForLocale(this.plugin.settings.locale);
-                    await this.plugin.saveSettings();
-                    new Notice('Configuration restaurée');
-                })
-            );
-
-    }
-
-    /**
-     * Met à jour les fixers actifs selon la locale choisie
-     */
-    private updateFixersForLocale(locale: string): void {
-        const activeFixers = LOCALE_CONFIGURATIONS[locale];
-        if (activeFixers) {
-            // Désactiver tous les fixers d'abord
-            Object.keys(this.plugin.settings.fixers).forEach((fixerId: string) => {
-                this.plugin.settings.fixers[fixerId] = false;
-            });
-            
-            // Activer les fixers recommandés pour cette locale
-            activeFixers.forEach((fixerId: string) => {
-                this.plugin.settings.fixers[fixerId] = true;
-            });
-            
-            // Redessiner l'interface pour refléter les changements
-            this.display();
+        // Ajouter un badge si c'est recommandé pour la locale actuelle
+        const isRecommended = this.isFixerRecommendedForCurrentLocale(fixer.id);
+        if (isRecommended) {
+          const badge = setting.nameEl.createEl("span", {
+            text: "Recommandé",
+            cls: "typography-recommended-badge",
+          });
         }
+
+        // Ajouter un exemple si disponible
+        if (fixer.getExample) {
+          const example = fixer.getExample();
+          const exampleEl = setting.descEl.createDiv({
+            cls: "typography-example",
+          });
+
+          exampleEl.createDiv({
+            cls: "typography-example-before",
+          }).innerHTML = `<span class="typography-example-label">Avant :</span> <code>${example.before}</code>`;
+
+          exampleEl.createDiv({
+            cls: "typography-example-after",
+          }).innerHTML = `<span class="typography-example-label">Après :</span> <code>${example.after}</code>`;
+        }
+      });
+    });
+  }
+
+  /**
+   * Crée la section des actions
+   */
+  private createActionsSection(containerEl: HTMLElement): void {
+    containerEl.createEl("h3", { text: "Actions" });
+
+    // Section: Actions (simplifiée)
+    new Setting(containerEl)
+      .setName("Restaurer la configuration recommandée")
+      .setDesc(
+        `Active les fixers recommandés pour ${
+          LOCALE_NAMES[this.plugin.settings.locale]
+        }`
+      )
+      .addButton((button) =>
+        button.setButtonText("Restaurer").onClick(async () => {
+          this.updateFixersForLocale(this.plugin.settings.locale);
+          await this.plugin.saveSettings();
+          new Notice("Configuration restaurée");
+        })
+      );
+  }
+
+  /**
+   * Met à jour les fixers actifs selon la locale choisie
+   */
+  private updateFixersForLocale(locale: string): void {
+    const activeFixers = LOCALE_CONFIGURATIONS[locale];
+    if (activeFixers) {
+      // Désactiver tous les fixers d'abord
+      Object.keys(this.plugin.settings.fixers).forEach((fixerId: string) => {
+        this.plugin.settings.fixers[fixerId] = false;
+      });
+
+      // Activer les fixers recommandés pour cette locale
+      activeFixers.forEach((fixerId: string) => {
+        this.plugin.settings.fixers[fixerId] = true;
+      });
+
+      // Redessiner l'interface pour refléter les changements
+      this.display();
     }
+  }
 
-    /**
-     * Vérifie si un fixer est recommandé pour la locale actuelle
-     */
-    private isFixerRecommendedForCurrentLocale(fixerId: string): boolean {
-        const recommendedFixers = LOCALE_CONFIGURATIONS[this.plugin.settings.locale];
-        return recommendedFixers ? recommendedFixers.includes(fixerId) : false;
-    }
+  /**
+   * Vérifie si un fixer est recommandé pour la locale actuelle
+   */
+  private isFixerRecommendedForCurrentLocale(fixerId: string): boolean {
+    const recommendedFixers =
+      LOCALE_CONFIGURATIONS[this.plugin.settings.locale];
+    return recommendedFixers ? recommendedFixers.includes(fixerId) : false;
+  }
 
-
-
-    /**
-     * Ajoute les styles CSS personnalisés
-     */
-    private addCustomStyles(containerEl: HTMLElement): void {
-        if (!containerEl.querySelector('.typography-custom-styles')) {
-            const style = containerEl.createEl('style', { cls: 'typography-custom-styles' });
-            style.textContent = `
+  /**
+   * Ajoute les styles CSS personnalisés
+   */
+  private addCustomStyles(containerEl: HTMLElement): void {
+    if (!containerEl.querySelector(".typography-custom-styles")) {
+      const style = containerEl.createEl("style", {
+        cls: "typography-custom-styles",
+      });
+      style.textContent = `
                 .typography-category-header {
                     display: flex;
                     justify-content: space-between;
@@ -282,6 +300,9 @@ export class TypographySettingTab extends PluginSettingTab {
                     font-family: var(--font-monospace);
                     font-size: 0.9em;
                     border: 1px solid var(--background-modifier-border-hover);
+                    user-select: text;
+    pointer-events: auto;
+    cursor: text;
                 }
                 
                 .typography-example-before {
@@ -309,60 +330,29 @@ export class TypographySettingTab extends PluginSettingTab {
                     margin-top: 12px;
                 }
             `;
-        }
     }
+  }
 
-    /**
-     * Crée les paramètres de mise en évidence
-     * @param containerEl Conteneur parent
-     */
-    private createHighlightSettings(containerEl: HTMLElement): void {
-        const desEl = containerEl.createEl("p", {
-        text: "Affichage des caractères invisibles",
-        });
-        desEl.style.fontWeight = "bold";
-        desEl.style.marginTop = "3em";
+  /**
+   * Crée les paramètres de mise en évidence
+   * @param containerEl Conteneur parent
+   */
+  private createHighlightSettings(containerEl: HTMLElement): void {
+    const desEl = containerEl.createEl("p", {
+      text: "Affichage des caractères invisibles",
+    });
+    desEl.style.fontWeight = "bold";
+    desEl.style.marginTop = "3em";
 
-        new Setting(containerEl)
-        .setName("Activer l'affichage des caractères invisibles")
-        .addToggle((toggle) =>
-            toggle
-            .setValue(this.plugin.settings.highlightEnabled)
-            .onChange(async (value) => {
-                this.plugin.settings.highlightEnabled = value;
-                await this.plugin.saveSettings();
-            })
-        );
-
-        new Setting(containerEl)
-        .setName("Bouton dans la barre d'état")
-        .setDesc(
-            "Afficher un bouton d'activation/désactivation"
-        )
-        .addToggle((toggle) =>
-            toggle
-            .setValue(this.plugin.settings.highlightButton)
-            .onChange(async (value) => {
-                this.plugin.settings.highlightButton = value;
-                await this.plugin.saveSettings();
-            })
-        );
-
-        new Setting(containerEl)
-        .setName("Bouton dans la barre de titre")
-        .setDesc(
-            "Afficher un bouton d'activation/désactivation dans la barre de titre des onglets"
-        )
-        .addToggle((toggle) =>
-            toggle
-                .setValue(this.plugin.settings.tabTitleBarButton)
-                .onChange(async (value) => {
-                    this.plugin.settings.tabTitleBarButton = value;
-                    await this.plugin.saveSettings();
-                })
-        );
-
-
-    }
-
+    new Setting(containerEl)
+      .setName("Activer l'affichage des caractères invisibles")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.highlightEnabled)
+          .onChange(async (value) => {
+            this.plugin.settings.highlightEnabled = value;
+            await this.plugin.saveSettings();
+          })
+      );
+  }
 }

@@ -21,6 +21,10 @@ import {
   validateSettings,
 } from "./settings/default-settings";
 
+
+
+
+
 /**
  * Plugin principal Typography Fixers
  * Correction typographique modulaire pour Obsidian
@@ -38,7 +42,7 @@ export default class TypographyPlugin extends Plugin {
    * Chargement du plugin
    */
 async onload(): Promise<void> {
-    console.log('🚀 Chargement du plugin Typography Fixers v2');
+    console.log('🚀 Chargement du plugin Typography');
 
     try {
         // Charger les paramètres
@@ -54,12 +58,20 @@ async onload(): Promise<void> {
         // Appliquer l'état initial d'affichage via CSS
         this.updateInvisibleCharsDisplay();
 
-        // Ajouter les boutons
-        this.statusBarButton = createStatusBarButton(
-            this,
-            this.settings.highlightEnabled,
-            () => this.toggleHighlight()
-        );
+        if (this.settings.highlightButton) {
+            this.statusBarButton = createStatusBarButton(
+                this, 
+                this.settings.highlightEnabled,
+                this.toggleHighlight.bind(this)
+            );
+        }
+
+
+        // this.statusBarButton = createStatusBarButton(
+        //     this,
+        //     this.settings.highlightEnabled,
+        //     () => this.toggleHighlight()
+        // );
 
         this.tabTitleBarButton = createTabTitleBarButton(
             this,

@@ -96,10 +96,7 @@
     opacity: 0.8;
 }
 
-#highlight-status-bar-button.highlight-enabled {
-    opacity: 1;
-    color: var(--interactive-accent);
-}
+
 
 /* Bouton barre de titre */
 #highlight-tab-title-button {
@@ -112,7 +109,8 @@
     opacity: 0.9;
 }
 
-#highlight-tab-title-button.highlight-enabled {
+#highlight-tab-title-button.is-active ,
+#highlight-status-bar-button.is-active{
     opacity: 1;
     color: var(--interactive-accent);
 }

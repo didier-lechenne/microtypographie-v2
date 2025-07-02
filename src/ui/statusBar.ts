@@ -77,6 +77,7 @@ export function createTabTitleBarButton(
     return buttonEl;
 }
 
+
 /**
  * Met à jour l'apparence du bouton de la barre d'état
  * @param buttonEl Élément HTML du bouton
@@ -86,9 +87,9 @@ export function updateStatusBarButton(buttonEl: HTMLElement | null, isEnabled: b
     if (!buttonEl) return;
     
     if (isEnabled) {
-        buttonEl.addClass('highlight-enabled');
+        buttonEl.addClass('is-active');
     } else {
-        buttonEl.removeClass('highlight-enabled');
+        buttonEl.removeClass('is-active');
     }
 }
 
