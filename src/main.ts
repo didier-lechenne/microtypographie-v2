@@ -67,17 +67,13 @@ async onload(): Promise<void> {
         }
 
 
-        // this.statusBarButton = createStatusBarButton(
-        //     this,
-        //     this.settings.highlightEnabled,
-        //     () => this.toggleHighlight()
-        // );
-
-        this.tabTitleBarButton = createTabTitleBarButton(
-            this,
-            this.settings.highlightEnabled,
-            () => this.toggleHighlight()
-        );
+        if (this.settings.tabTitleBarButton) {
+            this.tabTitleBarButton = createTabTitleBarButton(
+                this,
+                this.settings.highlightEnabled,
+                () => this.toggleHighlight()
+            );
+        }
 
         // Ajouter les commandes
         this.addCommands();

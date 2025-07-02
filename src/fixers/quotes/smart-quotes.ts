@@ -81,7 +81,7 @@ export class SmartQuotes extends BaseFixer {
         if (this.isLocaleCompatible(['fr'])) {
             return {
                 before: 'Il a dit "Bonjour" et c\'est parti.',
-                after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_SPACE}${UNICODE_CHARS.RAQUO} et c${UNICODE_CHARS.RSQUO}est parti.`
+                after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et c${UNICODE_CHARS.RSQUO}est parti.`
             };
         } else {
             return {
