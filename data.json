@@ -1,6 +1,6 @@
 {
   "enableRealTimeCorrection": true,
-  "locale": "fr_FR",
+  "locale": "fr_CA",
   "highlightEnabled": true,
   "highlightButton": false,
   "tabTitleBarButton": false,
@@ -10,11 +10,11 @@
     "Dash": true,
     "SmartQuotes": true,
     "CurlyQuote": true,
-    "FrenchNoBreakSpace": true,
+    "FrenchNoBreakSpace": false,
     "NoSpaceBeforeComma": true,
     "Unit": true,
     "Dimension": true,
     "Hyphen": true,
-    "Trademark": false
+    "Trademark": true
   }
 }

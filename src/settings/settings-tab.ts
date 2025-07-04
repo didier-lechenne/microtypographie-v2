@@ -59,18 +59,7 @@ export class TypographySettingTab extends PluginSettingTab {
   private createGeneralSettings(containerEl: HTMLElement): void {
     containerEl.createEl("h3", { text: "Configuration générale" });
 
-    // Option pour les guillemets chevrons
-    new Setting(containerEl)
-        .setName("Guillemets << >>")
-        .setDesc("Active la conversion << et >> en guillemets français « » (français uniquement)")
-        .addToggle((toggle) =>
-            toggle
-                .setValue(this.plugin.settings.guillemetsEnabled)
-                .onChange(async (value) => {
-                    this.plugin.settings.guillemetsEnabled = value;
-                    await this.plugin.saveSettings();
-                })
-        );
+
 
       
     // Correction en temps réel
@@ -131,6 +120,20 @@ export class TypographySettingTab extends PluginSettingTab {
       text: "Activez ou désactivez les règles typographiques selon vos besoins. Les règles recommandées pour votre langue sont activées automatiquement.",
       cls: "setting-item-description",
     });
+
+
+    // Option pour les guillemets chevrons
+    new Setting(containerEl)
+        .setName("Guillemets << >>")
+        .setDesc("Active la conversion << et >> en guillemets français « »")
+        .addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.settings.guillemetsEnabled)
+                .onChange(async (value) => {
+                    this.plugin.settings.guillemetsEnabled = value;
+                    await this.plugin.saveSettings();
+                })
+        );
 
     // Grouper les fixers par catégorie
     const fixersByCategory = this.plugin.engine
