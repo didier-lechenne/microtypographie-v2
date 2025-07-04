@@ -32,6 +32,9 @@ export class TypographySettingTab extends PluginSettingTab {
       cls: "setting-item-description",
     });
 
+
+
+
     // Section: Configuration générale
     this.createGeneralSettings(containerEl);
 
@@ -47,12 +50,29 @@ export class TypographySettingTab extends PluginSettingTab {
     this.createHighlightSettings(containerEl);
   }
 
+
+
+  
   /**
    * Crée la section de configuration générale
    */
   private createGeneralSettings(containerEl: HTMLElement): void {
     containerEl.createEl("h3", { text: "Configuration générale" });
 
+    // Option pour les guillemets chevrons
+    new Setting(containerEl)
+        .setName("Guillemets << >>")
+        .setDesc("Active la conversion << et >> en guillemets français « » (français uniquement)")
+        .addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.settings.guillemetsEnabled)
+                .onChange(async (value) => {
+                    this.plugin.settings.guillemetsEnabled = value;
+                    await this.plugin.saveSettings();
+                })
+        );
+
+      
     // Correction en temps réel
     new Setting(containerEl)
       .setName("Correction en temps réel")

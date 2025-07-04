@@ -4,6 +4,7 @@
   "highlightEnabled": true,
   "highlightButton": false,
   "tabTitleBarButton": false,
+  "guillemetsEnabled": true,
   "fixers": {
     "Ellipsis": true,
     "Dash": true,

@@ -1,6 +1,6 @@
 // src/fixers/base/base-fixer.ts
 import { Editor } from 'obsidian';
-import { TypographicFixer, FixerCategory, FixerExample } from '../../types/interfaces';
+import { TypographicFixer, FixerCategory, FixerExample, TypographySettings } from '../../types/interfaces';
 
 /**
  * Classe de base abstraite pour tous les fixers typographiques
@@ -14,6 +14,18 @@ export abstract class BaseFixer implements TypographicFixer {
     
     public enabled: boolean = true;
     protected locale: string = 'fr-FR';
+    
+    protected settings?: TypographySettings;
+
+
+    public setSettings(settings: TypographySettings): void {
+        this.settings = settings;
+    }
+
+    protected isGuillemetsEnabled(): boolean {
+        return this.settings?.guillemetsEnabled ?? false;
+    }
+
 
     /**
      * Méthode principale de correction - doit être implémentée
@@ -26,6 +38,12 @@ export abstract class BaseFixer implements TypographicFixer {
     public setLocale(locale: string): void {
         this.locale = locale;
     }
+
+
+
+
+
+
 
     /**
      * Gestion des événements clavier (optionnelle)

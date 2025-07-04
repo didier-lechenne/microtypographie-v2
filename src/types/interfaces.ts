@@ -54,6 +54,12 @@ export interface TypographicFixer {
      * @param locale Code de langue (ex: 'fr-FR', 'en-US')
      */
     setLocale?(locale: string): void;
+
+    /**
+     * Configure les paramètres du fixer (optionnel)
+     * @param settings Configuration complète du plugin
+     */
+    setSettings?(settings: TypographySettings): void;
 }
 
 /**
@@ -85,6 +91,8 @@ export interface TypographySettings {
     
     highlightButton: boolean;
     tabTitleBarButton: boolean;
+
+    guillemetsEnabled: boolean;
 
     
 }

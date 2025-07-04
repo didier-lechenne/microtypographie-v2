@@ -1,12 +1,11 @@
 // src/fixers/quotes/smart-quotes.ts
+import { Editor } from 'obsidian';
 import { BaseFixer } from '../base/base-fixer';
 import { FixerExample } from '../../types/interfaces';
 import { UNICODE_CHARS } from '../../constants/unicode';
 
 /**
  * Fixer pour les guillemets intelligents
- * Convertit les guillemets droits en guillemets typographiques
- * Adapte le style selon la langue (français = « », anglais = " ")
  */
 export class SmartQuotes extends BaseFixer {
     public readonly id = 'SmartQuotes';
@@ -15,9 +14,6 @@ export class SmartQuotes extends BaseFixer {
     public readonly category = 'quotes' as const;
     public readonly priority = 4;
 
-    /**
-     * Applique les guillemets intelligents selon la langue
-     */
     public fix(text: string): string {
         if (this.isLocaleCompatible(['fr'])) {
             return this.fixFrenchQuotes(text);
@@ -26,14 +22,16 @@ export class SmartQuotes extends BaseFixer {
         }
     }
 
-    /**
-     * Applique les guillemets français « »
-     */
     private fixFrenchQuotes(text: string): string {
         let result = text;
-        let inQuote = false;
         
-        // Transformer les guillemets droits en guillemets français
+       
+        if (this.isGuillemetsEnabled()) {
+            result = result.replace(/<</g, `${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}`);
+            result = result.replace(/>>/g, `${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}`);
+        }
+        
+        let inQuote = false;
         result = result.replace(/"/g, () => {
             if (!inQuote) {
                 inQuote = true;
@@ -44,20 +42,14 @@ export class SmartQuotes extends BaseFixer {
             }
         });
         
-        // Transformer les apostrophes droites en apostrophes typographiques
         result = result.replace(/'/g, UNICODE_CHARS.RSQUO);
-        
         return result;
     }
 
-    /**
-     * Applique les guillemets anglais " "
-     */
     private fixEnglishQuotes(text: string): string {
         let result = text;
         let inQuote = false;
         
-        // Transformer les guillemets droits en guillemets anglais
         result = result.replace(/"/g, () => {
             if (!inQuote) {
                 inQuote = true;
@@ -68,20 +60,54 @@ export class SmartQuotes extends BaseFixer {
             }
         });
         
-        // Transformer les apostrophes dans les contractions
         result = result.replace(/(\w)'/g, `$1${UNICODE_CHARS.RSQUO}`);
-        
         return result;
     }
 
-    /**
-     * Fournit un exemple selon la langue
-     */
+    public handleKeyEvent(event: KeyboardEvent, editor: Editor): boolean {
+        if (this.isLocaleCompatible(['fr']) && this.isGuillemetsEnabled()) {
+            if (event.key === '<' || event.key === '>') {
+                return this.handleAngleBracket(event, editor);
+            }
+        }
+        return false;
+    }
+
+    private handleAngleBracket(event: KeyboardEvent, editor: Editor): boolean {
+        if (event.ctrlKey || event.metaKey) return false;
+
+        const cursor = editor.getCursor();
+        const line = editor.getLine(cursor.line);
+        const beforeCursor = line.substring(0, cursor.ch);
+        
+        if (event.key === '<' && beforeCursor.endsWith('<')) {
+            const newLine = line.substring(0, cursor.ch - 1) + 
+                           `${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}` + 
+                           line.substring(cursor.ch);
+            
+            editor.setLine(cursor.line, newLine);
+            editor.setCursor({ line: cursor.line, ch: cursor.ch + 1 });
+            return true;
+        }
+        
+        if (event.key === '>' && beforeCursor.endsWith('>')) {
+            const newLine = line.substring(0, cursor.ch - 1) + 
+                           `${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}` + 
+                           line.substring(cursor.ch);
+            
+            editor.setLine(cursor.line, newLine);
+            editor.setCursor({ line: cursor.line, ch: cursor.ch + 1 });
+            return true;
+        }
+        
+        return false;
+    }
+
     public getExample(): FixerExample {
         if (this.isLocaleCompatible(['fr'])) {
             return {
-                before: 'Il a dit "Bonjour" et c\'est parti.',
-                after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et c${UNICODE_CHARS.RSQUO}est parti.`
+                before: 'Il a dit "Bonjour" et <<Bonsoir>>.',
+                after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonsoir${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}.`
             };
         } else {
             return {

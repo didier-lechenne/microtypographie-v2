@@ -30,15 +30,18 @@ export class TypographyEngine {
         allFixers.forEach(fixer => {
             this.fixers.set(fixer.id, fixer);
             
-            // Appliquer les paramètres d'activation
             if (fixer.id in this.settings.fixers) {
                 fixer.enabled = this.settings.fixers[fixer.id];
             }
             
-            // Configurer la locale si le fixer le supporte
             if (fixer.setLocale) {
                 fixer.setLocale(this.settings.locale);
             }
+
+            if (fixer.setSettings) {
+                fixer.setSettings(this.settings);
+            }
+
         });
     }
 
@@ -58,6 +61,12 @@ export class TypographyEngine {
             if (fixer.setLocale) {
                 fixer.setLocale(settings.locale);
             }
+
+            if (fixer.setSettings) {
+                fixer.setSettings(settings);
+            }
+
+
         });
     }
 

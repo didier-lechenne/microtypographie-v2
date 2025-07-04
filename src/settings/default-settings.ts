@@ -9,7 +9,8 @@ export const DEFAULT_SETTINGS: TypographySettings = {
     locale: 'fr_FR',
     highlightEnabled: false,
     highlightButton: true,     
-    tabTitleBarButton: false,                      
+    tabTitleBarButton: false, 
+    guillemetsEnabled: true,                     
     fixers: {
         // Fixers JoliTypo - IDs exacts
         'Ellipsis': true,                // Points de suspension : ... → …
@@ -22,6 +23,7 @@ export const DEFAULT_SETTINGS: TypographySettings = {
         'Dimension': true,               // Multiplication : 12 x 34 → 12×34
         'Hyphen': false,                 // Césure (complexe, désactivé par défaut)
         'Trademark': true                // Marques : (c) → ©, (r) → ®, (tm) → ™
+        
     }
 };
 
@@ -98,7 +100,8 @@ export function createSettingsForLocale(locale: string): TypographySettings {
         locale: locale,
         highlightEnabled: false,
         highlightButton: true,        
-        tabTitleBarButton: false,     
+        tabTitleBarButton: false,  
+        guillemetsEnabled: true,   
         fixers: {}
     };
 
@@ -123,8 +126,9 @@ const validated: TypographySettings = {
     enableRealTimeCorrection: settings.enableRealTimeCorrection ?? DEFAULT_SETTINGS.enableRealTimeCorrection,
     locale: settings.locale ?? DEFAULT_SETTINGS.locale,
     highlightEnabled: settings.highlightEnabled ?? DEFAULT_SETTINGS.highlightEnabled,
-    highlightButton: settings.highlightButton ?? DEFAULT_SETTINGS.highlightButton,           // ✅ Ajouté
-    tabTitleBarButton: settings.tabTitleBarButton ?? DEFAULT_SETTINGS.tabTitleBarButton,     // ✅ Ajouté
+    highlightButton: settings.highlightButton ?? DEFAULT_SETTINGS.highlightButton,           
+    tabTitleBarButton: settings.tabTitleBarButton ?? DEFAULT_SETTINGS.tabTitleBarButton,
+    guillemetsEnabled: settings.guillemetsEnabled ?? DEFAULT_SETTINGS.guillemetsEnabled,  
     fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
 };
 
