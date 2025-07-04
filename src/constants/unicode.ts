@@ -25,8 +25,8 @@ export const UNICODE_CHARS = {
   // GUILLEMETS ET APOSTROPHES
   // ========================
 
-  LDQUO: "“" /** Guillemet ouvrant anglais (U+201C) */,
-  RDQUO: "”" /** Guillemet fermant anglais (U+201D) */,
+  LDQUO: "\u201C" /** Guillemet ouvrant anglais (U+201C) “ */,
+  RDQUO: "\u201D" /** Guillemet fermant anglais (U+201D) ” */,
 
   /** LSQUO: '“',  Apostrophe ouvrante (U+2018) - Rarement utilisée */
 

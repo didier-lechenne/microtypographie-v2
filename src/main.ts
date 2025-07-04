@@ -17,10 +17,8 @@ import { TypographySettings } from "./types/interfaces";
 // Import des modules
 import { TypographyEngine } from "./engine/typography-engine";
 import { TypographySettingTab } from "./settings/settings-tab";
-import {
-  validateSettings,
-} from "./settings/default-settings";
-
+import { validateSettings} from "./settings/default-settings";
+import { UNICODE_CHARS } from "./constants/unicode";
 
 
 
@@ -78,6 +76,8 @@ async onload(): Promise<void> {
         // Ajouter les commandes
         this.addCommands();
 
+        this.registerEditorMenuItems();
+
         // Gestionnaire d'événements clavier
         this.registerKeyboardHandlers();
 
@@ -123,6 +123,91 @@ async saveSettings(): Promise<void> {
     // Mettre à jour l'affichage CSS
     this.updateInvisibleCharsDisplay();
 }
+
+/**
+ * Enregistre les éléments dans le menu contextuel avec préfixe "Insérer"
+ */
+private registerEditorMenuItems(): void {
+    this.registerEvent(
+        this.app.workspace.on('editor-menu', (menu, editor, view) => {
+            // Ajouter une section "Insérer" avec nos éléments
+            menu.addSeparator();
+            
+            // Titre de section (non cliquable)
+            menu.addItem((item) => {
+                item
+                    .setTitle("— Insérer caractères typographiques —")
+                    .setIcon("type")
+                    .setDisabled(true);
+            });
+
+            // Espaces spéciaux
+            menu.addItem((item) => {
+                item
+                    .setTitle("Insérer : Espace insécable")
+                    .setIcon("space")
+                    .onClick(() => {
+                        this.insertSpecialChar(editor, UNICODE_CHARS.NO_BREAK_SPACE);
+                    });
+            });
+
+            menu.addItem((item) => {
+                item
+                    .setTitle("Insérer : Espace fine insécable")
+                    .setIcon("minus")
+                    .onClick(() => {
+                        this.insertSpecialChar(editor, UNICODE_CHARS.NO_BREAK_THIN_SPACE);
+                    });
+            });
+
+            // Guillemets
+            menu.addItem((item) => {
+                item
+                    .setTitle('Insérer : Guillemet ouvrant (“)')
+                    .setIcon("quote-glyph")
+                    .onClick(() => {
+                        this.insertSpecialChar(editor, UNICODE_CHARS.LDQUO);
+                    });
+            });
+
+            menu.addItem((item) => {
+                item
+                    .setTitle('Insérer : Guillemet fermant (”)')
+                    .setIcon("quote-glyph")
+                    .onClick(() => {
+                        this.insertSpecialChar(editor, UNICODE_CHARS.RDQUO);
+                    });
+            });
+
+            // Guillemets français si activés
+            if (this.settings.guillemetsEnabled && this.settings.locale.startsWith('fr')) {
+                menu.addItem((item) => {
+                    item
+                        .setTitle('Insérer : Guillemet français « ')
+                        .setIcon("quote-glyph")
+                        .onClick(() => {
+                            this.insertSpecialChar(editor, 
+                                `${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}`
+                            );
+                        });
+                });
+
+                menu.addItem((item) => {
+                    item
+                        .setTitle('Insérer : Guillemet français »')
+                        .setIcon("quote-glyph")
+                        .onClick(() => {
+                            this.insertSpecialChar(editor, 
+                                `${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}`
+                            );
+                        });
+                });
+            }
+        })
+    );
+}
+
+
   /**
    * Ajoute les commandes du plugin
    */
@@ -164,6 +249,99 @@ async saveSettings(): Promise<void> {
         this.toggleHighlight();
       },
     });
+
+    // Commande: Insérer espace insécable
+    this.addCommand({
+      id: "insert-non-breaking-space",
+      name: "Insérer espace insécable",
+      icon: "space",
+      editorCallback: (editor: Editor) => {
+        this.insertSpecialSpace(editor, UNICODE_CHARS.NO_BREAK_SPACE);
+      },
+      hotkeys: [
+        {
+          modifiers: ["Ctrl", "Shift"],
+          key: " " // Ctrl+Shift+Espace
+        }
+      ]
+    });
+
+    // Commande: Insérer espace fine insécable
+    this.addCommand({
+      id: "insert-thin-non-breaking-space", 
+      name: "Insérer espace fine insécable",
+      icon: "minus",
+      editorCallback: (editor: Editor) => {
+        this.insertSpecialSpace(editor, UNICODE_CHARS.NO_BREAK_THIN_SPACE);
+      },
+      hotkeys: [
+        {
+          modifiers: ["Ctrl", "Alt", "Shift"],
+          key: " " // Ctrl+Alt+Espace
+        }
+      ]
+    });
+
+    // Commande: Insérer guillemet ouvrant anglais
+    this.addCommand({
+      id: "insert-left-double-quote",
+      name: "Insérer guillemet ouvrant anglais (“)",
+      icon: "quote-glyph",
+      editorCallback: (editor: Editor) => {
+        this.insertSpecialChar(editor, UNICODE_CHARS.LDQUO);
+      },
+      hotkeys: [
+        {
+          modifiers: ["Ctrl"],
+          key: "7" // Ctrl+Shift+[
+        }
+      ]
+    });
+
+    // Commande: Insérer guillemet fermant anglais
+    this.addCommand({
+      id: "insert-right-double-quote",
+      name: "Insérer guillemet fermant anglais (”)",
+      icon: "quote-glyph",
+      editorCallback: (editor: Editor) => {
+        this.insertSpecialChar(editor, UNICODE_CHARS.RDQUO);
+      },
+      hotkeys: [
+        {
+          modifiers: ["Ctrl"],
+          key: "8" // Ctrl+Shift+]
+        }
+      ]
+    });
+
+
+
+  }
+
+  /**
+   * Insère un caractère spécial à la position du curseur
+   */
+  private insertSpecialChar(editor: Editor, character: string): void {
+      const cursor = editor.getCursor();
+      editor.replaceRange(character, cursor);
+      // Déplacer le curseur après le caractère inséré
+      editor.setCursor({
+          line: cursor.line,
+          ch: cursor.ch + 1
+      });
+  }
+
+  /**
+   * Insère un caractère d'espace spécial à la position du curseur
+   */
+  private insertSpecialSpace(editor: Editor, spaceChar: string): void {
+      const cursor = editor.getCursor();
+      editor.replaceRange(spaceChar, cursor);
+      // Déplacer le curseur après le caractère inséré
+      editor.setCursor({
+          line: cursor.line,
+          ch: cursor.ch + 1
+      });
   }
 
   /**
