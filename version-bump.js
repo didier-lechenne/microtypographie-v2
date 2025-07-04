@@ -34,6 +34,12 @@ if (!versionRegex.test(targetVersion)) {
     process.exit(1);
 }
 
+// Vérifier si la version a changé
+if (currentVersion === targetVersion) {
+    console.log(`Version is already ${targetVersion}. No changes needed.`);
+    process.exit(0);
+}
+
 console.log(`🔄 Updating version to ${targetVersion}...`);
 
 // Mettre à jour manifest.json
@@ -87,36 +93,66 @@ for (const file of optionalFiles) {
     }
 }
 
-// Ajouter les fichiers à Git
-console.log(`📝 Committing changes...`);
+// Vérifier s'il y a des changements à committer
+console.log(`📝 Checking for changes...`);
 try {
-    execSync('git add manifest.json package.json versions.json main.js', { stdio: 'inherit' });
-    if (styleFile) {
-        execSync(`git add ${styleFile}`, { stdio: 'inherit' });
-    }
+    const gitStatus = execSync('git status --porcelain', { encoding: 'utf8' });
     
-    execSync(`git commit -m "Release v${targetVersion}"`, { stdio: 'inherit' });
-    console.log(`✅ Changes committed`);
+    if (gitStatus.trim() === '') {
+        console.log(`ℹ️  No changes to commit. Files may already be up to date.`);
+        
+        // Vérifier si le tag existe déjà
+        try {
+            execSync(`git rev-parse v${targetVersion}`, { stdio: 'ignore' });
+            console.log(`🏷️  Tag v${targetVersion} already exists`);
+            console.log(`🎉 Version ${targetVersion} is already released!`);
+            process.exit(0);
+        } catch (tagError) {
+            // Le tag n'existe pas, on peut le créer
+            console.log(`🏷️  Creating tag v${targetVersion} for current commit...`);
+        }
+    } else {
+        // Il y a des changements, on fait le commit normal
+        console.log(`📝 Committing changes...`);
+        
+        // Ajouter tous les fichiers modifiés
+        execSync('git add -A', { stdio: 'inherit' });
+        execSync(`git commit -m "Release v${targetVersion}"`, { stdio: 'inherit' });
+        console.log(`✅ Changes committed`);
+    }
 } catch (error) {
-    console.error(`❌ Git commit failed:`, error.message);
+    console.error(`❌ Git status/commit failed:`, error.message);
     process.exit(1);
 }
 
 // Créer et pousser le tag
 console.log(`🏷️  Creating tag v${targetVersion}...`);
 try {
-    execSync(`git tag v${targetVersion}`, { stdio: 'inherit' });
+    // Créer le tag (avec --force au cas où il existerait)
+    execSync(`git tag -f v${targetVersion}`, { stdio: 'inherit' });
+    
+    // Pousser les changements et le tag
     execSync(`git push origin main`, { stdio: 'inherit' });
-    execSync(`git push origin v${targetVersion}`, { stdio: 'inherit' });
+    execSync(`git push origin v${targetVersion} --force`, { stdio: 'inherit' });
     console.log(`✅ Tag created and pushed`);
 } catch (error) {
     console.error(`❌ Git tag/push failed:`, error.message);
-    process.exit(1);
+    console.error(`You may need to push manually: git push origin main && git push origin v${targetVersion}`);
+    // Ne pas sortir en erreur, continuer avec la release GitHub
 }
 
 // Créer la release GitHub avec les fichiers
 console.log(`🚀 Creating GitHub release...`);
 try {
+    // Vérifier si la release existe déjà
+    try {
+        execSync(`gh release view v${targetVersion}`, { stdio: 'ignore' });
+        console.log(`📦 Release v${targetVersion} already exists, deleting it first...`);
+        execSync(`gh release delete v${targetVersion} --yes`, { stdio: 'inherit' });
+    } catch (releaseError) {
+        // La release n'existe pas, c'est normal
+    }
+
     // Construire la commande de release
     let releaseCommand = `gh release create v${targetVersion} manifest.json main.js`;
     
@@ -128,7 +164,7 @@ try {
 
 ## Installation
 1. Download \`manifest.json\`, \`main.js\`${styleFile ? `, and \`${styleFile}\`` : ''} from this release
-2. Create folder \`microtypographie\` in your vault's \`.obsidian/plugins/\` folder  
+2. Create folder \`microtypographie-v2\` in your vault's \`.obsidian/plugins/\` folder  
 3. Place the downloaded files in that folder
 4. Reload Obsidian and enable the plugin in settings
 
