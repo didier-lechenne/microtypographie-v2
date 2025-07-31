@@ -108,36 +108,21 @@ export class TypographyEngine {
   /**
    * Traite un texte et retourne des informations détaillées sur les corrections
    */
-  public processTextWithDetails(text: string): CorrectionResult {
-    const original = text;
-    const enabledFixers = this.getEnabledFixers();
-    const fixersUsed: string[] = [];
-    let correctionsCount = 0;
+public processTextWithDetails(text: string): CorrectionResult {
+  const original = text;
+  const corrected = this.processText(text); // Utilise le masquage
+  
+  // Stats simplifiées car on ne peut plus tracker individuellement
+  const correctionsCount = original !== corrected ? 1 : 0;
+  const fixersUsed = correctionsCount > 0 ? ['multiple'] : [];
 
-    const corrected = enabledFixers.reduce((currentText, fixer) => {
-      try {
-        const fixedText = fixer.fix(currentText);
-        if (fixedText !== currentText) {
-          fixersUsed.push(fixer.id);
-          correctionsCount++;
-        }
-        return fixedText;
-      } catch (error) {
-        console.warn(
-          `[TypographyEngine] Erreur dans le fixer ${fixer.id}:`,
-          error
-        );
-        return currentText;
-      }
-    }, text);
-
-    return {
-      original,
-      corrected,
-      correctionsCount,
-      fixersUsed,
-    };
-  }
+  return {
+    original,
+    corrected,
+    correctionsCount,
+    fixersUsed,
+  };
+}
 
   /**
    * Gère les événements clavier en temps réel
