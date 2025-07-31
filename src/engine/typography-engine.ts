@@ -330,17 +330,12 @@ private maskProtectedContent(text: string): {
   maskedText = maskedText.replace(
     /\(notes?\s*:\s*"([\s\S]*?)"\s*\)/g,
     (match: string, notesText: string) => {
-      // Appliquer les corrections typographiques directement avec les fixers
-      const enabledFixers = this.getEnabledFixers();
-      const correctedNotes = enabledFixers.reduce((text, fixer) => {
-        try {
-          return fixer.fix(text);
-        } catch (error) {
-          console.warn(`[TypographyEngine] Erreur dans le fixer ${fixer.id}:`, error);
-          return text;
-        }
-      }, notesText);
-      return `(notes: "${correctedNotes}")`;
+      // Appliquer manuellement les principales corrections typographiques
+      let corrected = notesText;
+      corrected = corrected.replace(/\.\.\./g, '…');
+      corrected = corrected.replace(/--/g, '—');
+      corrected = corrected.replace(/"/g, (_, index) => index % 2 === 0 ? '«' : '»');
+      return `(notes: "${corrected}")`;
     }
   );
 
