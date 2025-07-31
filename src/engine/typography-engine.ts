@@ -347,25 +347,32 @@ public processTextWithDetails(text: string): CorrectionResult {
 
     // 3. Protéger les shortcodes 11ty/Nunjucks AVEC traitement spécial pour caption
 
-
-maskedText = maskedText.replace(
-  /{%\s+(\w+)\s+([\s\S]*?)\s+%}/g,
-  (match: string, shortcodeName: string, shortcodeContent: string) => {
-    let processedContent = shortcodeContent;
-    
-    // Traiter SEULEMENT les captions
-    processedContent = processedContent.replace(
-      /caption:\s*"([^"]*?)"/g,
-      (captionMatch: string, captionText: string) => {
-        const correctedCaption = this.processTextContent(captionText);
-        return `caption: "${correctedCaption}"`;
-      }
+    maskedText = maskedText.replace(
+    /{%\s+(\w+)\s+([\s\S]*?)\s+%}/g,
+    (match: string, shortcodeName: string, shortcodeContent: string) => {
+        let processedContent = shortcodeContent;
+        
+        // Traiter SEULEMENT les captions
+        processedContent = processedContent.replace(
+        /caption:\s*"([^"]*?)"/g,
+        (_, captionText: string) => {
+            const correctedCaption = this.processTextContent(captionText);
+            return `caption: "${correctedCaption}"`;
+        }
+        );
+        
+        const correctedShortcode = `{% ${shortcodeName} ${processedContent} %}`;
+        
+        // GARDER la protection
+        const placeholder = generatePlaceholder("shortcode");
+        protectedZones.push({
+        placeholder,
+        originalContent: correctedShortcode,
+        type: "shortcode"
+        });
+        return placeholder;
+    }
     );
-    
-    // Retourner le shortcode avec caption corrigée SANS le protéger
-    return `{% ${shortcodeName} ${processedContent} %}`;
-  }
-);
 
     // 4. Protéger les WikiLinks
     maskedText = maskedText.replace(/\[\[([^\]]+)\]\]/g, (match) => {
