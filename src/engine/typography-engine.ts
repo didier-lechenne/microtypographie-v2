@@ -314,138 +314,146 @@ export class TypographyEngine {
    * les zones à protéger
    */
   private maskProtectedContent(text: string): {
-    maskedText: string;
-    protectedZones: ProtectedZone[];
-  } {
-    const protectedZones: ProtectedZone[] = [];
-    let maskedText = text;
-    let placeholderCounter = 0;
+  maskedText: string;
+  protectedZones: ProtectedZone[];
+} {
+  const protectedZones: ProtectedZone[] = [];
+  let maskedText = text;
+  let placeholderCounter = 0;
 
-    // Générateur de marqueurs uniques
-    const generatePlaceholder = (type: string): string => {
-      return `__TYPOGRAPHY_PROTECTED_${type.toUpperCase()}_${placeholderCounter++}__`;
-    };
+  // Générateur de marqueurs uniques
+  const generatePlaceholder = (type: string): string => {
+    return `__TYPOGRAPHY_PROTECTED_${type.toUpperCase()}_${placeholderCounter++}__`;
+  };
 
-    // 1. Protéger le frontmatter YAML
-    maskedText = maskedText.replace(
-      /^---\s*\n([\s\S]*?)\n---\s*\n/m,
-      (match) => {
-        const placeholder = generatePlaceholder("frontmatter");
-        protectedZones.push({
-          placeholder,
-          originalContent: match,
-          type: "frontmatter",
-        });
-        return placeholder;
-      }
-    );
-
-    // 2. Protéger les blocs de code
-    maskedText = maskedText.replace(/```[\s\S]*?```/g, (match) => {
-      const placeholder = generatePlaceholder("codeblock");
+  // 1. Protéger le frontmatter YAML
+  maskedText = maskedText.replace(
+    /^---\s*\n([\s\S]*?)\n---\s*\n/m,
+    (match) => {
+      const placeholder = generatePlaceholder("frontmatter");
       protectedZones.push({
         placeholder,
         originalContent: match,
-        type: "codeblock",
+        type: "frontmatter",
       });
       return placeholder;
+    }
+  );
+
+  // 2. Protéger les blocs de code
+  maskedText = maskedText.replace(/```[\s\S]*?```/g, (match) => {
+    const placeholder = generatePlaceholder("codeblock");
+    protectedZones.push({
+      placeholder,
+      originalContent: match,
+      type: "codeblock",
     });
+    return placeholder;
+  });
 
-    // 3. Protéger les shortcodes 11ty/Nunjucks AVEC traitement spécial pour caption
-    maskedText = maskedText.replace(
-      /{%\s+(\w+)\s+([\s\S]*?)\s+%}/g,
-      (match: string, shortcodeName: string, shortcodeContent: string) => {
-        let processedContent = shortcodeContent;
-
-        // Traiter SEULEMENT les captions
-        processedContent = processedContent.replace(
-          /caption:\s*"([^"]*?)"/g,
-          (_, captionText: string) => {
-            const correctedCaption = this.processTextContent(captionText);
-            return `caption: "${correctedCaption}"`;
-          }
-        );
-
-        const correctedShortcode = `{% ${shortcodeName} ${processedContent} %}`;
-
-        // GARDER la protection
-        const placeholder = generatePlaceholder("shortcode");
-        protectedZones.push({
-          placeholder,
-          originalContent: correctedShortcode,
-          type: "shortcode",
-        });
-        return placeholder;
-      }
-    );
-
-    // 3.5. Traiter les patterns (notes: "...") directement dans le texte
-    maskedText = maskedText.replace(
-      /\(notes?\s*:\s*"([\s\S]*?)"\s*\)/g,
-      (match: string, notesText: string) => {
-        // Appliquer les corrections typographiques sur le contenu des notes
-        const correctedNotes = this.processTextContent(notesText);
-        return `(notes: "${correctedNotes}")`;
-      }
-    );
-
-    // 4. Protéger les WikiLinks
-    maskedText = maskedText.replace(/\[\[([^\]]+)\]\]/g, (match) => {
-      const placeholder = generatePlaceholder("wikilink");
+  // 3. Protéger les shortcodes 11ty/Nunjucks AVEC traitement spécial pour caption
+  maskedText = maskedText.replace(
+    /{%\s+(\w+)\s+([\s\S]*?)\s+%}/g,
+    (match: string, shortcodeName: string, shortcodeContent: string) => {
+      let processedContent = shortcodeContent;
+      
+      // Traiter SEULEMENT les captions
+      processedContent = processedContent.replace(
+        /caption:\s*"([^"]*?)"/g,
+        (_, captionText: string) => {
+          const correctedCaption = this.processTextContent(captionText);
+          return `caption: "${correctedCaption}"`;
+        }
+      );
+      
+      const correctedShortcode = `{% ${shortcodeName} ${processedContent} %}`;
+      
+      // GARDER la protection
+      const placeholder = generatePlaceholder("shortcode");
       protectedZones.push({
         placeholder,
-        originalContent: match,
-        type: "wikilink",
+        originalContent: correctedShortcode,
+        type: "shortcode"
       });
       return placeholder;
-    });
+    }
+  );
 
-    // 5. Protéger les URLs
-    maskedText = maskedText.replace(/https?:\/\/[^\s\])\}]+/g, (match) => {
-      const placeholder = generatePlaceholder("url");
-      protectedZones.push({
-        placeholder,
-        originalContent: match,
-        type: "url",
-      });
-      return placeholder;
-    });
+  // 3.5. Traiter les patterns (notes: "...") directement dans le texte
+  maskedText = maskedText.replace(
+    /\(notes?\s*:\s*"([\s\S]*?)"\s*\)/g,
+    (match: string, notesText: string) => {
+      // Appliquer les corrections typographiques directement avec les fixers
+      const enabledFixers = this.getEnabledFixers();
+      const correctedNotes = enabledFixers.reduce((text, fixer) => {
+        try {
+          return fixer.fix(text);
+        } catch (error) {
+          console.warn(`[TypographyEngine] Erreur dans le fixer ${fixer.id}:`, error);
+          return text;
+        }
+      }, notesText);
+      return `(notes: "${correctedNotes}")`;
+    }
+  );
 
-    // 6. Protéger les expressions régulières /pattern/flags
-    maskedText = maskedText.replace(/\/[^\/\s]+\/[gimuy]*/g, (match) => {
-      const placeholder = generatePlaceholder("regex");
-      protectedZones.push({
-        placeholder,
-        originalContent: match,
-        type: "regex",
-      });
-      return placeholder;
+  // 4. Protéger les WikiLinks
+  maskedText = maskedText.replace(/\[\[([^\]]+)\]\]/g, (match) => {
+    const placeholder = generatePlaceholder("wikilink");
+    protectedZones.push({
+      placeholder,
+      originalContent: match,
+      type: "wikilink",
     });
+    return placeholder;
+  });
 
-    // 7. Protéger le code inline `code`
-    maskedText = maskedText.replace(/`[^`]+`/g, (match) => {
-      const placeholder = generatePlaceholder("inlinecode");
-      protectedZones.push({
-        placeholder,
-        originalContent: match,
-        type: "regex", // Réutilise le type regex
-      });
-      return placeholder;
+  // 5. Protéger les URLs
+  maskedText = maskedText.replace(/https?:\/\/[^\s\])\}]+/g, (match) => {
+    const placeholder = generatePlaceholder("url");
+    protectedZones.push({
+      placeholder,
+      originalContent: match,
+      type: "url",
     });
+    return placeholder;
+  });
 
-    // 8. Protéger les liens markdown [text](url)
-    maskedText = maskedText.replace(/\[([^\]]*)\]\([^\)]+\)/g, (match) => {
-      const placeholder = generatePlaceholder("mdlink");
-      protectedZones.push({
-        placeholder,
-        originalContent: match,
-        type: "url", // Réutilise le type url
-      });
-      return placeholder;
+  // 6. Protéger les expressions régulières /pattern/flags
+  maskedText = maskedText.replace(/\/[^\/\s]+\/[gimuy]*/g, (match) => {
+    const placeholder = generatePlaceholder("regex");
+    protectedZones.push({
+      placeholder,
+      originalContent: match,
+      type: "regex",
     });
+    return placeholder;
+  });
 
-    return { maskedText, protectedZones };
-  }
+  // 7. Protéger le code inline `code`
+  maskedText = maskedText.replace(/`[^`]+`/g, (match) => {
+    const placeholder = generatePlaceholder("inlinecode");
+    protectedZones.push({
+      placeholder,
+      originalContent: match,
+      type: "regex", // Réutilise le type regex
+    });
+    return placeholder;
+  });
+
+  // 8. Protéger les liens markdown [text](url)
+  maskedText = maskedText.replace(/\[([^\]]*)\]\([^\)]+\)/g, (match) => {
+    const placeholder = generatePlaceholder("mdlink");
+    protectedZones.push({
+      placeholder,
+      originalContent: match,
+      type: "url", // Réutilise le type url
+    });
+    return placeholder;
+  });
+
+  return { maskedText, protectedZones };
+}
 
   /**
    * 🔓 Restaure le contenu original à la place des marqueurs
