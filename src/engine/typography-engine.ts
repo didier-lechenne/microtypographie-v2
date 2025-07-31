@@ -13,7 +13,7 @@ import { createAllFixers } from "../fixers";
 interface ProtectedZone {
   placeholder: string;
   originalContent: string;
-  type: "frontmatter" | "codeblock" | "wikilink" | "url" | "regex";
+  type: "frontmatter" | "codeblock" | "wikilink" | "url" | "regex" | "shortcode";
 }
 
 /**
@@ -301,7 +301,7 @@ export class TypographyEngine {
   }
 
   /**
-   * Applique les fixers (méthode originale renommée)
+   * Applique les fixers sur un texte
    */
   private processTextContent(text: string): string {
     const enabledFixers = this.getEnabledFixers();
@@ -375,7 +375,7 @@ export class TypographyEngine {
           captionPattern,
           (captionMatch: string, captionText: string) => {
             // Appliquer les corrections typographiques SEULEMENT sur le texte de la caption
-            const correctedCaption = this.applyFixersToText(captionText);
+            const correctedCaption = this.processTextContent(captionText);
             return `caption: "${correctedCaption}"`;
           }
         );
@@ -388,7 +388,7 @@ export class TypographyEngine {
         protectedZones.push({
           placeholder,
           originalContent: correctedShortcode,
-          type: "regex", // Réutilise le type existant
+         type: "shortcode",
         });
         return placeholder;
       }
@@ -450,25 +450,6 @@ export class TypographyEngine {
     });
 
     return { maskedText, protectedZones };
-  }
-
-  /**
-   * Applique les fixers sur un texte (méthode séparée pour éviter la duplication)
-   */
-  private applyFixersToText(text: string): string {
-    const enabledFixers = this.getEnabledFixers();
-
-    return enabledFixers.reduce((currentText, fixer) => {
-      try {
-        return fixer.fix(currentText);
-      } catch (error) {
-        console.warn(
-          `[TypographyEngine] Erreur dans le fixer ${fixer.id}:`,
-          error
-        );
-        return currentText;
-      }
-    }, text);
   }
 
   /**
