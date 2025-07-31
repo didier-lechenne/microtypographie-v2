@@ -313,7 +313,7 @@ export class TypographyEngine {
   /**
    * les zones à protéger
    */
-  private maskProtectedContent(text: string): {
+private maskProtectedContent(text: string): {
   maskedText: string;
   protectedZones: ProtectedZone[];
 } {
@@ -325,6 +325,24 @@ export class TypographyEngine {
   const generatePlaceholder = (type: string): string => {
     return `__TYPOGRAPHY_PROTECTED_${type.toUpperCase()}_${placeholderCounter++}__`;
   };
+
+  // 1.5. Traiter les patterns (notes: "...") EN PREMIER, avant toute protection
+  maskedText = maskedText.replace(
+    /\(notes?\s*:\s*"([\s\S]*?)"\s*\)/g,
+    (match: string, notesText: string) => {
+      // Appliquer les corrections typographiques directement avec les fixers
+      const enabledFixers = this.getEnabledFixers();
+      const correctedNotes = enabledFixers.reduce((text, fixer) => {
+        try {
+          return fixer.fix(text);
+        } catch (error) {
+          console.warn(`[TypographyEngine] Erreur dans le fixer ${fixer.id}:`, error);
+          return text;
+        }
+      }, notesText);
+      return `(notes: "${correctedNotes}")`;
+    }
+  );
 
   // 1. Protéger le frontmatter YAML
   maskedText = maskedText.replace(
@@ -379,23 +397,7 @@ export class TypographyEngine {
     }
   );
 
-  // 3.5. Traiter les patterns (notes: "...") directement dans le texte
-  maskedText = maskedText.replace(
-    /\(notes?\s*:\s*"([\s\S]*?)"\s*\)/g,
-    (match: string, notesText: string) => {
-      // Appliquer les corrections typographiques directement avec les fixers
-      const enabledFixers = this.getEnabledFixers();
-      const correctedNotes = enabledFixers.reduce((text, fixer) => {
-        try {
-          return fixer.fix(text);
-        } catch (error) {
-          console.warn(`[TypographyEngine] Erreur dans le fixer ${fixer.id}:`, error);
-          return text;
-        }
-      }, notesText);
-      return `(notes: "${correctedNotes}")`;
-    }
-  );
+
 
   // 4. Protéger les WikiLinks
   maskedText = maskedText.replace(/\[\[([^\]]+)\]\]/g, (match) => {
