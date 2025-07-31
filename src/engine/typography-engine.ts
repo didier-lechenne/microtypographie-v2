@@ -13,7 +13,13 @@ import { createAllFixers } from "../fixers";
 interface ProtectedZone {
   placeholder: string;
   originalContent: string;
-  type: "frontmatter" | "codeblock" | "wikilink" | "url" | "regex" | "shortcode";
+  type:
+    | "frontmatter"
+    | "codeblock"
+    | "wikilink"
+    | "url"
+    | "regex"
+    | "shortcode";
 }
 
 /**
@@ -108,21 +114,21 @@ export class TypographyEngine {
   /**
    * Traite un texte et retourne des informations détaillées sur les corrections
    */
-public processTextWithDetails(text: string): CorrectionResult {
-  const original = text;
-  const corrected = this.processText(text); // Utilise le masquage
-  
-  // Stats simplifiées car on ne peut plus tracker individuellement
-  const correctionsCount = original !== corrected ? 1 : 0;
-  const fixersUsed = correctionsCount > 0 ? ['multiple'] : [];
+  public processTextWithDetails(text: string): CorrectionResult {
+    const original = text;
+    const corrected = this.processText(text); // Utilise le masquage
 
-  return {
-    original,
-    corrected,
-    correctionsCount,
-    fixersUsed,
-  };
-}
+    // Stats simplifiées car on ne peut plus tracker individuellement
+    const correctionsCount = original !== corrected ? 1 : 0;
+    const fixersUsed = correctionsCount > 0 ? ["multiple"] : [];
+
+    return {
+      original,
+      corrected,
+      correctionsCount,
+      fixersUsed,
+    };
+  }
 
   /**
    * Gère les événements clavier en temps réel
@@ -305,7 +311,7 @@ public processTextWithDetails(text: string): CorrectionResult {
   }
 
   /**
-   * 🛡️ Masque toutes les zones à protéger avec des marqueurs temporaires
+   * les zones à protéger
    */
   private maskProtectedContent(text: string): {
     maskedText: string;
@@ -346,32 +352,41 @@ public processTextWithDetails(text: string): CorrectionResult {
     });
 
     // 3. Protéger les shortcodes 11ty/Nunjucks AVEC traitement spécial pour caption
-
     maskedText = maskedText.replace(
-    /{%\s+(\w+)\s+([\s\S]*?)\s+%}/g,
-    (match: string, shortcodeName: string, shortcodeContent: string) => {
+      /{%\s+(\w+)\s+([\s\S]*?)\s+%}/g,
+      (match: string, shortcodeName: string, shortcodeContent: string) => {
         let processedContent = shortcodeContent;
-        
+
         // Traiter SEULEMENT les captions
         processedContent = processedContent.replace(
-        /caption:\s*"([^"]*?)"/g,
-        (_, captionText: string) => {
+          /caption:\s*"([^"]*?)"/g,
+          (_, captionText: string) => {
             const correctedCaption = this.processTextContent(captionText);
             return `caption: "${correctedCaption}"`;
-        }
+          }
         );
-        
+
         const correctedShortcode = `{% ${shortcodeName} ${processedContent} %}`;
-        
+
         // GARDER la protection
         const placeholder = generatePlaceholder("shortcode");
         protectedZones.push({
-        placeholder,
-        originalContent: correctedShortcode,
-        type: "shortcode"
+          placeholder,
+          originalContent: correctedShortcode,
+          type: "shortcode",
         });
         return placeholder;
-    }
+      }
+    );
+
+    // 3.5. Traiter les patterns (notes: "...") directement dans le texte
+    maskedText = maskedText.replace(
+      /\(notes?\s*:\s*"([\s\S]*?)"\s*\)/g,
+      (match: string, notesText: string) => {
+        // Appliquer les corrections typographiques sur le contenu des notes
+        const correctedNotes = this.processTextContent(notesText);
+        return `(notes: "${correctedNotes}")`;
+      }
     );
 
     // 4. Protéger les WikiLinks
