@@ -347,7 +347,7 @@ export class TypographyEngine {
         // Appliquer TOUTES les corrections typo sur le contenu complet
         const corrected = this.processTextContent(notesText);
 
-        console.log("Texte note corrigé:", corrected);
+        // console.log("Texte note corrigé:", corrected);
 
         const correctedNote = `(note: "${corrected}")`;
 

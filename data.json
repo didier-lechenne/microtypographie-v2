@@ -1,5 +1,5 @@
 {
-  "enableRealTimeCorrection": false,
+  "enableRealTimeCorrection": true,
   "locale": "fr_FR",
   "highlightEnabled": true,
   "highlightButton": false,
