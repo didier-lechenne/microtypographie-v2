@@ -361,13 +361,13 @@ export class TypographyEngine {
       return placeholder;
     });
 
-    // 3. Protéger le code inline `code`
-    maskedText = maskedText.replace(/`[^`]+`/g, (match) => {
-      const placeholder = generatePlaceholder("inlinecode");
+    // 3. Protéger les commentaires HTML (avant les balises pour éviter les conflits)
+    maskedText = maskedText.replace(/<!--[\s\S]*?-->/g, (match) => {
+      const placeholder = generatePlaceholder("html");
       protectedZones.push({
         placeholder,
         originalContent: match,
-        type: "inlinecode",
+        type: "html",
       });
       return placeholder;
     });
@@ -383,13 +383,13 @@ export class TypographyEngine {
       return placeholder;
     });
 
-    // 5. Protéger les commentaires HTML
-    maskedText = maskedText.replace(/<!--[\s\S]*?-->/g, (match) => {
-      const placeholder = generatePlaceholder("html");
+    // 5. Protéger le code inline `code` (après HTML pour éviter les conflits)
+    maskedText = maskedText.replace(/`[^`]+`/g, (match) => {
+      const placeholder = generatePlaceholder("inlinecode");
       protectedZones.push({
         placeholder,
         originalContent: match,
-        type: "html",
+        type: "inlinecode",
       });
       return placeholder;
     });
@@ -447,8 +447,8 @@ export class TypographyEngine {
           }
         );
 
-        // Pattern pour détecter notes: "..."
-        const notesPattern = /\(notes?\s*:\s*"([\s\S]*?)"\s*\)/g;
+        // Pattern pour détecter notes: "..." avec gestion des guillemets imbriqués
+        const notesPattern = /\(notes?\s*:\s*"((?:[^"\\]|\\.|"[^"]*")*?)"\s*\)/g;
         processedContent = processedContent.replace(
           notesPattern,
           (notesMatch: string, notesText: string) => {
