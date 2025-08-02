@@ -41,7 +41,27 @@ export class SmartQuotes extends BaseFixer {
                 return `${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}`;
             }
         });
+
+
+
+        result = result.replace(
+            /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g,
+            `$1${UNICODE_CHARS.LDQUO}$2${UNICODE_CHARS.RDQUO}$3`
+        );
         
+
+        // result = result.replace(
+        //     /(«\u202F[^»]*)'([^']*)'([^»]*\u202F»)/g,
+        //     `$1${UNICODE_CHARS.LDQUO}$2${UNICODE_CHARS.RDQUO}$3`
+        // );
+        
+
+
+        result = result.replace(
+            /(«\u202F[^»]*)«\u202F([^»]*)\u202F»([^»]*\u202F»)/g,
+            `$1${UNICODE_CHARS.LDQUO}$2${UNICODE_CHARS.RDQUO}$3`
+        );
+
         result = result.replace(/'/g, UNICODE_CHARS.RSQUO);
         return result;
     }
@@ -106,13 +126,18 @@ export class SmartQuotes extends BaseFixer {
     public getExample(): FixerExample {
         if (this.isLocaleCompatible(['fr'])) {
             return {
-                before: 'Il a dit "Bonjour" et <<Bonsoir>>.',
-                after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonsoir${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}.`
+                before: 'Il a dit "Bonjour" et <<Il m\'a dit \'Salut\' hier>>.',
+                after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Il m${UNICODE_CHARS.RSQUO}a dit ${UNICODE_CHARS.LDQUO}Salut${UNICODE_CHARS.RDQUO} hier${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO}.`
             };
-        } else {
+        } else if (this.isLocaleCompatible(['en'])) {
             return {
                 before: 'He said "Hello" and it\'s done.',
                 after: `He said ${UNICODE_CHARS.LDQUO}Hello${UNICODE_CHARS.RDQUO} and it${UNICODE_CHARS.RSQUO}s done.`
+            };
+        } else {
+            return {
+                before: 'Er sagte "Hallo" und es ist \'fertig\'.',
+                after: `Er sagte ${UNICODE_CHARS.LDQUO}Hallo${UNICODE_CHARS.RDQUO} und es ist ${UNICODE_CHARS.RSQUO}fertig${UNICODE_CHARS.RSQUO}.`
             };
         }
     }
