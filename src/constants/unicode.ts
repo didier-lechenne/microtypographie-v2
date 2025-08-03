@@ -13,6 +13,7 @@ export const UNICODE_CHARS = {
   NO_BREAK_SPACE: "\u00A0" /** Espace insécable (U+00A0) - Utilisée avant : en français */,
   NORMAL_SPACE: " " /** Espace normale (pour référence) */,
 
+
   // ========================
   // PONCTUATION
   // ========================
@@ -33,6 +34,8 @@ export const UNICODE_CHARS = {
   RSQUO: "’" /** Apostrophe fermante/typographique (U+2019) - Remplace ' */,
   LAQUO: "«" /** Guillemet français ouvrant (U+00AB) */,
   RAQUO: "»" /** Guillemet français fermant (U+00BB) */,
+
+  STRAIGHT_QUOTE: "\u0022" /** Guillemet droit ASCII (U+0022) */,
 
   BDQUO: "„", // &bdquo; or &#8222;
   SHY: "\xC2\xAD", // &shy;

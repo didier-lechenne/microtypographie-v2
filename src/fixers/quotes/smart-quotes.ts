@@ -66,6 +66,7 @@ export class SmartQuotes extends BaseFixer {
     return result;
   }
 
+
   private fixEnglishQuotes(text: string): string {
     let result = text;
     let inQuote = false;
