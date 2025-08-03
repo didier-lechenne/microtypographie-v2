@@ -22,8 +22,8 @@ export const DEFAULT_SETTINGS: TypographySettings = {
         'Unit': true,                    // Espaces avant unités : 25 kg
         'Dimension': true,               // Multiplication : 12 x 34 → 12×34
         'Hyphen': false,                 // Césure (complexe, désactivé par défaut)
-        'Trademark': true                // Marques : (c) → ©, (r) → ®, (tm) → ™
-        
+        'Trademark': true,               // Marques : (c) → ©, (r) → ®, (tm) → ™
+        'OneLetterWords': true           // Mots d'une lettre avec espace insécable
     }
 };
 
@@ -53,7 +53,8 @@ export const LOCALE_CONFIGURATIONS: Record<string, string[]> = {
         'NoSpaceBeforeComma', 
         'CurlyQuote', 
         'Hyphen', 
-        'Trademark'
+        'Trademark',
+        'OneLetterWords'
     ],
     'fr_CA': [
         'Ellipsis', 
@@ -64,7 +65,8 @@ export const LOCALE_CONFIGURATIONS: Record<string, string[]> = {
         'NoSpaceBeforeComma', 
         'CurlyQuote', 
         'Hyphen', 
-        'Trademark'
+        'Trademark',
+        'OneLetterWords'
     ],
     'de_DE': [
         'Ellipsis', 
@@ -154,6 +156,7 @@ export function getRecommendedFixersForLocale(locale: string): string[] {
     return LOCALE_CONFIGURATIONS[locale] || LOCALE_CONFIGURATIONS['fr_FR'];
 }
 
+
 /**
  * Vérifie si un fixer est recommandé pour une locale donnée
  */
@@ -167,7 +170,7 @@ export function isFixerRecommendedForLocale(fixerId: string, locale: string): bo
  */
 export const FIXER_CATEGORIES: Record<string, string[]> = {
     'punctuation': ['Ellipsis', 'Dash', 'Hyphen'],
-    'spacing': ['FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'Unit', 'Dimension'],
+    'spacing': ['FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'Unit', 'Dimension', 'OneLetterWords'],
     'quotes': ['SmartQuotes', 'CurlyQuote'],
     'symbols': ['Trademark']
 };

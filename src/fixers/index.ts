@@ -13,6 +13,7 @@ export { FrenchNoBreakSpace } from './spacing/french-spacing';
 export { NoSpaceBeforeComma } from './spacing/comma';
 export { Unit } from './spacing/unit';
 export { Dimension } from './spacing/dimension';
+export { OneLetterWords } from './spacing/one-letter-words';
 
 // Export des fixers de guillemets
 export { SmartQuotes } from './quotes/smart-quotes';
@@ -30,6 +31,7 @@ import { CurlyQuote } from './quotes/curly-quote';
 import { NoSpaceBeforeComma } from './spacing/comma';
 import { Unit } from './spacing/unit';
 import { Dimension } from './spacing/dimension';
+import { OneLetterWords } from './spacing/one-letter-words';
 import { Trademark } from './symbols/trademark';
 import { Hyphen } from './punctuation/hyphen';
 
@@ -52,6 +54,7 @@ export function createAllFixers(): TypographicFixer[] {
         new Dimension(),     // priorité 8
         new Trademark(),     // priorité 9
         new Hyphen(),        // priorité 10 (désactivé par défaut)
+        new OneLetterWords(), // priorité 11
     ];
 }
 
@@ -79,6 +82,7 @@ export const FixerFactories = {
             new NoSpaceBeforeComma(),
             new Unit(),
             new Dimension(),
+            new OneLetterWords(),
         ];
     },
 
@@ -116,6 +120,7 @@ export const FixerFactories = {
             new Dimension(),
             new Trademark(),
             new NoSpaceBeforeComma(),
+            new OneLetterWords(),
             // Note: Hyphen désactivé par défaut car complexe
         ];
     },
@@ -134,6 +139,7 @@ export const FixerFactories = {
             new Dimension(),
             new Trademark(),
             new NoSpaceBeforeComma(),
+            // Note: OneLetterWords pas activé par défaut pour l'anglais
             // Note: Hyphen désactivé par défaut
         ];
     }
@@ -143,13 +149,13 @@ export const FixerFactories = {
  * Métadonnées sur les fixers disponibles
  */
 export const FixerMetadata = {
-    totalCount: 10, // Nombre total de fixers implémentés
+    totalCount: 11,
     categories: ['punctuation', 'spacing', 'quotes', 'symbols'] as const,
     
     getCategoryCount(category: string): number {
         const categoryMap: Record<string, number> = {
             'punctuation': 3,   // Ellipsis, Dash, Hyphen
-            'spacing': 4,       // FrenchNoBreakSpace, NoSpaceBeforeComma, Unit, Dimension
+            'spacing': 5,       // FrenchNoBreakSpace, NoSpaceBeforeComma, Unit, Dimension, OneLetterWords
             'quotes': 2,        // SmartQuotes, CurlyQuote  
             'symbols': 1        // Trademark
         };
@@ -165,6 +171,7 @@ export const FixerMetadata = {
             'NoSpaceBeforeComma',
             'Unit',
             'Dimension',
+            'OneLetterWords',
             'SmartQuotes',
             'CurlyQuote',
             'Trademark'
@@ -176,8 +183,8 @@ export const FixerMetadata = {
      */
     getRecommendedFixersForLocale(locale: string): string[] {
         const localeMap: Record<string, string[]> = {
-            'fr_FR': ['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark'],
-            'fr_CA': ['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark'],
+            'fr_FR': ['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark', 'OneLetterWords'],
+            'fr_CA': ['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark', 'OneLetterWords'],
             'en_GB': ['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark'],
             'de_DE': ['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark']
         };

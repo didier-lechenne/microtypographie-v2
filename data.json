@@ -15,6 +15,7 @@
     "Unit": true,
     "Dimension": true,
     "Hyphen": false,
-    "Trademark": true
+    "Trademark": true,
+    "OneLetterWords": false
   }
 }
