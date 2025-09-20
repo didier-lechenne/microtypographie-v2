@@ -1,6 +1,6 @@
 // src/main.ts - Plugin principal modulaire
 import { App, Editor, MarkdownView, Plugin, Notice } from "obsidian";
-import { createDecorations } from './ui/decorations';
+import { createDecorations, updateDecorationSettings } from './ui/decorations';
 import {
   createStatusBarButton,
   updateStatusBarButton,
@@ -119,6 +119,7 @@ async saveSettings(): Promise<void> {
     if (this.engine) {
         this.engine.updateSettings(this.settings);
     }
+    updateDecorationSettings(this.settings);
     
     // Mettre à jour l'affichage CSS
     this.updateInvisibleCharsDisplay();
