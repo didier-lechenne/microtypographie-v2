@@ -377,5 +377,22 @@ export class TypographySettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+        .setName("Afficher dans les blocs de code")
+        .setDesc("Affiche les caractères invisibles même dans les blocs de code (```)")
+        .addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.settings.showInCodeBlocks)
+                .onChange(async (value) => {
+                    this.plugin.settings.showInCodeBlocks = value;
+                    await this.plugin.saveSettings();
+                })
+        )
+
+
   }
+
+
+  
 }

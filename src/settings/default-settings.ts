@@ -10,7 +10,8 @@ export const DEFAULT_SETTINGS: TypographySettings = {
     highlightEnabled: false,
     highlightButton: true,     
     tabTitleBarButton: false, 
-    guillemetsEnabled: true,                     
+    guillemetsEnabled: true,
+    showInCodeBlocks: true,                     
     fixers: {
         // Fixers JoliTypo - IDs exacts
         'Ellipsis': true,                // Points de suspension : ... → …
@@ -103,7 +104,8 @@ export function createSettingsForLocale(locale: string): TypographySettings {
         highlightEnabled: false,
         highlightButton: true,        
         tabTitleBarButton: false,  
-        guillemetsEnabled: true,   
+        guillemetsEnabled: true, 
+        showInCodeBlocks: true,  
         fixers: {}
     };
 
@@ -130,7 +132,8 @@ const validated: TypographySettings = {
     highlightEnabled: settings.highlightEnabled ?? DEFAULT_SETTINGS.highlightEnabled,
     highlightButton: settings.highlightButton ?? DEFAULT_SETTINGS.highlightButton,           
     tabTitleBarButton: settings.tabTitleBarButton ?? DEFAULT_SETTINGS.tabTitleBarButton,
-    guillemetsEnabled: settings.guillemetsEnabled ?? DEFAULT_SETTINGS.guillemetsEnabled,  
+    guillemetsEnabled: settings.guillemetsEnabled ?? DEFAULT_SETTINGS.guillemetsEnabled,
+    showInCodeBlocks: settings.showInCodeBlocks ?? DEFAULT_SETTINGS.showInCodeBlocks,  
     fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
 };
 

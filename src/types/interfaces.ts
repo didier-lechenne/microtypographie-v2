@@ -91,10 +91,8 @@ export interface TypographySettings {
     
     highlightButton: boolean;
     tabTitleBarButton: boolean;
-
     guillemetsEnabled: boolean;
-
-    
+    showInCodeBlocks: boolean;
 }
 
 /**

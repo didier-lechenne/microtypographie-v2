@@ -89,10 +89,10 @@ export function createDecorations(settings: TypographySettings) {
                         }
                         
                         // Vérifier si la ligne actuelle est dans un bloc spécial
-                        const isInSpecialBlock = inFrontmatter || inCodeBlock;
+                        const shouldDecorate = !inFrontmatter && (!inCodeBlock || currentSettings.showInCodeBlocks);
                         
                         // Appliquer les décorations seulement si on n'est pas dans un bloc spécial
-                        if (!isInSpecialBlock) {
+                        if (!shouldDecorate) {
                             if (char === '\u00A0') {
                                 builder.add(pos, pos + 1, nonBreakingSpaceDecoration);
                             }
