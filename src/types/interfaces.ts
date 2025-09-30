@@ -7,6 +7,11 @@ import { Editor } from 'obsidian';
 export type FixerCategory = 'punctuation' | 'spacing' | 'symbols' | 'quotes';
 
 /**
+ * Type d'espace avant les deux-points en français
+ */
+export type ColonSpaceType = 'thin' | 'normal';
+
+/**
  * Interface pour un correcteur typographique
  */
 export interface TypographicFixer {
@@ -94,7 +99,8 @@ export interface TypographySettings {
 
     guillemetsEnabled: boolean;
 
-    
+    /** Type d'espace avant les deux-points en français */
+    colonSpaceType: ColonSpaceType;
 }
 
 /**

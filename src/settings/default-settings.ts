@@ -10,26 +10,24 @@ export const DEFAULT_SETTINGS: TypographySettings = {
     highlightEnabled: false,
     highlightButton: true,     
     tabTitleBarButton: false, 
-    guillemetsEnabled: true,                     
+    guillemetsEnabled: true,
+    colonSpaceType: 'thin', // Espace fine insécable par défaut (comportement standard français)
     fixers: {
-        // Fixers JoliTypo - IDs exacts
-        'Ellipsis': true,                // Points de suspension : ... → …
-        'Dash': true,                    // Tirets typographiques : -- → —
-        'SmartQuotes': true,             // Guillemets intelligents selon locale
-        'CurlyQuote': true,              // Apostrophes courbes : ' → '
-        'FrenchNoBreakSpace': true,      // Espaces insécables français : ! ? ; :
-        'NoSpaceBeforeComma': true,      // Virgules sans espace avant
-        'Unit': true,                    // Espaces avant unités : 25 kg
-        'Dimension': true,               // Multiplication : 12 x 34 → 12×34
-        'Hyphen': false,                 // Césure (complexe, désactivé par défaut)
-        'Trademark': true                // Marques : (c) → ©, (r) → ®, (tm) → ™
-        
+        'Ellipsis': true,
+        'Dash': true,
+        'SmartQuotes': true,
+        'CurlyQuote': true,
+        'FrenchNoBreakSpace': true,
+        'NoSpaceBeforeComma': true,
+        'Unit': true,
+        'Dimension': true,
+        'Hyphen': false,
+        'Trademark': true
     }
 };
 
 /**
  * Configurations JoliTypo par locale
- * Utilise Record<string, string[]> pour la compatibilité TypeScript
  */
 export const LOCALE_CONFIGURATIONS: Record<string, string[]> = {
     'en_GB': [
@@ -101,7 +99,8 @@ export function createSettingsForLocale(locale: string): TypographySettings {
         highlightEnabled: false,
         highlightButton: true,        
         tabTitleBarButton: false,  
-        guillemetsEnabled: true,   
+        guillemetsEnabled: true,
+        colonSpaceType: 'thin', // Toujours par défaut
         fixers: {}
     };
 
@@ -122,15 +121,16 @@ export function createSettingsForLocale(locale: string): TypographySettings {
  * Valide et corrige les paramètres chargés
  */
 export function validateSettings(settings: Partial<TypographySettings>): TypographySettings {
-const validated: TypographySettings = {
-    enableRealTimeCorrection: settings.enableRealTimeCorrection ?? DEFAULT_SETTINGS.enableRealTimeCorrection,
-    locale: settings.locale ?? DEFAULT_SETTINGS.locale,
-    highlightEnabled: settings.highlightEnabled ?? DEFAULT_SETTINGS.highlightEnabled,
-    highlightButton: settings.highlightButton ?? DEFAULT_SETTINGS.highlightButton,           
-    tabTitleBarButton: settings.tabTitleBarButton ?? DEFAULT_SETTINGS.tabTitleBarButton,
-    guillemetsEnabled: settings.guillemetsEnabled ?? DEFAULT_SETTINGS.guillemetsEnabled,  
-    fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
-};
+    const validated: TypographySettings = {
+        enableRealTimeCorrection: settings.enableRealTimeCorrection ?? DEFAULT_SETTINGS.enableRealTimeCorrection,
+        locale: settings.locale ?? DEFAULT_SETTINGS.locale,
+        highlightEnabled: settings.highlightEnabled ?? DEFAULT_SETTINGS.highlightEnabled,
+        highlightButton: settings.highlightButton ?? DEFAULT_SETTINGS.highlightButton,
+        tabTitleBarButton: settings.tabTitleBarButton ?? DEFAULT_SETTINGS.tabTitleBarButton,
+        guillemetsEnabled: settings.guillemetsEnabled ?? DEFAULT_SETTINGS.guillemetsEnabled,
+        colonSpaceType: settings.colonSpaceType ?? DEFAULT_SETTINGS.colonSpaceType, // Validation du nouveau paramètre
+        fixers: { ...DEFAULT_SETTINGS.fixers, ...settings.fixers }
+    };
 
     // Assurer que tous les fixers ont une valeur booléenne
     Object.keys(DEFAULT_SETTINGS.fixers).forEach(fixerId => {
@@ -141,7 +141,12 @@ const validated: TypographySettings = {
 
     // Vérifier que la locale est supportée
     if (!(validated.locale in LOCALE_CONFIGURATIONS)) {
-        validated.locale = 'fr_FR'; // Fallback vers français
+        validated.locale = 'fr_FR';
+    }
+
+    // Valider colonSpaceType
+    if (validated.colonSpaceType !== 'thin' && validated.colonSpaceType !== 'normal') {
+        validated.colonSpaceType = 'thin';
     }
 
     return validated;

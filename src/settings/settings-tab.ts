@@ -32,9 +32,6 @@ export class TypographySettingTab extends PluginSettingTab {
       cls: "setting-item-description",
     });
 
-
-
-
     // Section: Configuration générale
     this.createGeneralSettings(containerEl);
 
@@ -50,18 +47,12 @@ export class TypographySettingTab extends PluginSettingTab {
     this.createHighlightSettings(containerEl);
   }
 
-
-
-  
   /**
    * Crée la section de configuration générale
    */
   private createGeneralSettings(containerEl: HTMLElement): void {
     containerEl.createEl("h3", { text: "Configuration générale" });
 
-
-
-      
     // Correction en temps réel
     new Setting(containerEl)
       .setName("Correction en temps réel")
@@ -93,9 +84,28 @@ export class TypographySettingTab extends PluginSettingTab {
             this.plugin.settings.locale = value;
             this.updateFixersForLocale(value);
             await this.plugin.saveSettings();
-            // Note: this.display() sera appelé dans updateFixersForLocale()
           });
       });
+
+    // NOUVEAU : Type d'espace avant deux-points (seulement pour le français)
+    if (this.plugin.settings.locale.startsWith('fr')) {
+      new Setting(containerEl)
+        .setName("Espace avant deux-points (:)")
+        .setDesc("Choisissez le type d'espace insécable à utiliser avant les deux-points")
+        .addDropdown((dropdown) => {
+          dropdown
+            .addOption('thin', 'Espace fine insécable (recommandé)')
+            .addOption('normal', 'Espace insécable normale')
+            .setValue(this.plugin.settings.colonSpaceType)
+            .onChange(async (value) => {
+              // Valider que la valeur est correcte
+              if (value === 'thin' || value === 'normal') {
+                this.plugin.settings.colonSpaceType = value;
+                await this.plugin.saveSettings();
+              }
+            });
+        });
+    }
 
     // Information sur les fixers actifs
     const activeFixersCount = Object.values(this.plugin.settings.fixers).filter(
@@ -120,7 +130,6 @@ export class TypographySettingTab extends PluginSettingTab {
       text: "Activez ou désactivez les règles typographiques selon vos besoins. Les règles recommandées pour votre langue sont activées automatiquement.",
       cls: "setting-item-description",
     });
-
 
     // Option pour les guillemets chevrons
     new Setting(containerEl)
@@ -216,7 +225,6 @@ export class TypographySettingTab extends PluginSettingTab {
   private createActionsSection(containerEl: HTMLElement): void {
     containerEl.createEl("h3", { text: "Actions" });
 
-    // Section: Actions (simplifiée)
     new Setting(containerEl)
       .setName("Restaurer la configuration recommandée")
       .setDesc(
@@ -324,8 +332,8 @@ export class TypographySettingTab extends PluginSettingTab {
                     font-size: 0.9em;
                     border: 1px solid var(--background-modifier-border-hover);
                     user-select: text;
-    pointer-events: auto;
-    cursor: text;
+                    pointer-events: auto;
+                    cursor: text;
                 }
                 
                 .typography-example-before {
@@ -335,30 +343,12 @@ export class TypographySettingTab extends PluginSettingTab {
                 .typography-example-after {
                     margin-top: 6px;
                 }
-                
-                .typography-test-original,
-                .typography-test-corrected {
-                    background: var(--background-secondary);
-                    padding: 12px;
-                    border-radius: 4px;
-                    margin: 8px 0;
-                    font-family: var(--font-monospace);
-                    font-size: 0.9em;
-                    white-space: pre-wrap;
-                }
-                
-                .typography-no-changes {
-                    color: var(--text-warning);
-                    font-style: italic;
-                    margin-top: 12px;
-                }
             `;
     }
   }
 
   /**
    * Crée les paramètres de mise en évidence
-   * @param containerEl Conteneur parent
    */
   private createHighlightSettings(containerEl: HTMLElement): void {
     const desEl = containerEl.createEl("p", {

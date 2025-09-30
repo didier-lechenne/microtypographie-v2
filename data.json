@@ -5,6 +5,7 @@
   "highlightButton": false,
   "tabTitleBarButton": false,
   "guillemetsEnabled": true,
+  "colonSpaceType": "normal",
   "fixers": {
     "Ellipsis": true,
     "Dash": true,

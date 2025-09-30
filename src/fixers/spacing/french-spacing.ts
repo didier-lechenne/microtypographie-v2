@@ -15,7 +15,7 @@ export class FrenchNoBreakSpace extends BaseFixer {
     public readonly category = 'spacing' as const;
     public readonly priority = 3;
 
-    public enabled = true; // Activé par défaut pour le français
+    public enabled = true;
 
     /**
      * Applique les règles d'espacement françaises
@@ -26,16 +26,19 @@ export class FrenchNoBreakSpace extends BaseFixer {
             return text;
         }
 
+        // Récupérer le type d'espace pour les deux-points depuis les settings
+        const colonSpace = this.getColonSpace();
+
         const transforms = [
             // Espace fine insécable avant ; ! ? »
             {
                 pattern: /\s*([;!?»])/g,
                 replacement: `${UNICODE_CHARS.NO_BREAK_THIN_SPACE}$1`
             },
-            // Espace insécable avant :
+            // Espace avant : (type configurable)
             {
                 pattern: /\s*(:)/g,
-                replacement: `${UNICODE_CHARS.NO_BREAK_SPACE}$1`
+                replacement: `${colonSpace}$1`
             },
             // Espace insécable après «
             {
@@ -53,6 +56,22 @@ export class FrenchNoBreakSpace extends BaseFixer {
     }
 
     /**
+     * Retourne le type d'espace à utiliser avant les deux-points
+     * selon la configuration utilisateur
+     */
+    private getColonSpace(): string {
+        // Valeur par défaut : espace fine insécable
+        if (!this.settings?.colonSpaceType) {
+            return UNICODE_CHARS.NO_BREAK_THIN_SPACE;
+        }
+
+        // Utiliser la configuration de l'utilisateur
+        return this.settings.colonSpaceType === 'normal' 
+            ? UNICODE_CHARS.NO_BREAK_SPACE 
+            : UNICODE_CHARS.NO_BREAK_THIN_SPACE;
+    }
+
+    /**
      * Gère la saisie en temps réel des signes de ponctuation français
      */
     public handleKeyEvent(event: KeyboardEvent, editor: Editor): boolean {
@@ -60,11 +79,14 @@ export class FrenchNoBreakSpace extends BaseFixer {
             return false;
         }
 
+        // Récupérer le type d'espace pour les deux-points
+        const colonSpace = this.getColonSpace();
+
         const punctuationMap: Record<string, string> = {
             '!': UNICODE_CHARS.NO_BREAK_THIN_SPACE,
             '?': UNICODE_CHARS.NO_BREAK_THIN_SPACE,
             ';': UNICODE_CHARS.NO_BREAK_THIN_SPACE,
-            ':': UNICODE_CHARS.NO_BREAK_SPACE
+            ':': colonSpace // Utilise la config utilisateur
         };
 
         if (punctuationMap[event.key] && !event.ctrlKey && !event.metaKey) {
@@ -93,10 +115,13 @@ export class FrenchNoBreakSpace extends BaseFixer {
     /**
      * Fournit un exemple de transformation
      */
-public getExample(): FixerExample {
-    return {
-        before: 'Il a dit "Bonjour" et c\'est parti.',
-        after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et c${UNICODE_CHARS.RSQUO}est parti.`
-    };
-}
+    public getExample(): FixerExample {
+        // L'exemple change selon la config de l'espace avant deux-points
+        const colonSpace = this.getColonSpace();
+        
+        return {
+            before: 'Il a dit "Bonjour" et c\'est parti.',
+            after: `Il a dit ${UNICODE_CHARS.LAQUO}${UNICODE_CHARS.NO_BREAK_THIN_SPACE}Bonjour${UNICODE_CHARS.NO_BREAK_THIN_SPACE}${UNICODE_CHARS.RAQUO} et c${UNICODE_CHARS.RSQUO}est parti.`
+        };
+    }
 }
