@@ -13,25 +13,25 @@
     background-position: center;
     background-color: unset;
     font-family: var(--font-text);
-    line-height: var(--line-height-normal);
-    /* display: inline-block; */
+    line-height: 100%;
+    display: inline-block;
     vertical-align: middle;
   }
 
   .typography-show-invisible .nonBreakingSpace {
     background-color: var(--color-non-breaking-space);
     font-family: var(--font-text);
-    line-height: var(--line-height-normal);
-    /* display: inline-block; */
+    line-height: 100%;
+    display: inline-block;
     vertical-align: middle;
   }
 
   .typography-show-invisible .thinSpace {
     font-family: var(--font-text);
-    line-height: var(--line-height-normal);
+    line-height: 100%;
     background-color: var(--color-narrow-no-break-space);
 
-    /* display: inline-block; */
+    display: inline-block;
     vertical-align: middle;
   }
 
